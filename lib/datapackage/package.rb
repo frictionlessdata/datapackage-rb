@@ -5,7 +5,7 @@ module DataPackage
     class Package
                 
         attr_reader :package, :opts
-
+                
         # Parse a data package
         #
         # Supports reading data from JSON file, directory, and a URL
@@ -24,8 +24,26 @@ module DataPackage
                 if package.start_with?("http") && !package.end_with?("datapackage.json")
                     package = URI.join(package, "datapackage.json")
                 end                    
+                @location = package.to_s
                 @package = JSON.parse( open(package).read )                
             end
+        end
+        
+        #Returns the directory for a local file package or base url for a remote
+        #Returns nil for an in-memory object (because it has no base as yet)
+        def base
+            return nil unless @location
+            if local?
+                return File.dirname( @location )
+            else
+                return @location.split("/")[0..-2].join("/")
+            end
+        end
+        
+        #Is this a local package? Returns true if created from an in-memory object or a file/directory reference
+        def local?             
+            return !@location.start_with?("http") if @location
+            return true
         end
         
         def name
