@@ -32,7 +32,11 @@ module DataPackage
         #Returns the directory for a local file package or base url for a remote
         #Returns nil for an in-memory object (because it has no base as yet)
         def base
+            #user can override base
+            return @opts[:base] if @opts[:base]
+            #no override and no location, so return nil
             return nil unless @location
+            #work out base directory or uri
             if local?
                 return File.dirname( @location )
             else
@@ -144,6 +148,13 @@ module DataPackage
             messages[:warnings] << "#{prefix} 'licenses' property" if licenses.empty?
             messages[:warnings] << "#{prefix} 'datapackage_version' property" unless datapackage_version 
             messages[:warnings] << "#{prefix} README.md file" unless resource_exists?("README.md")
+                
+            resources.each do |resource|
+                if !resource_exists?( resource["path"] )
+                    messages[:errors] << "Resource #{resource["path"]} does not exist"
+                end
+            end
+            
             messages
         end
                 
@@ -162,7 +173,8 @@ module DataPackage
         end
         
         def resource_exists?(path)
-            if @location && local?
+            return false unless base
+            if local?
                 return File.exists?( File.join(base, path) )
             else
                 begin

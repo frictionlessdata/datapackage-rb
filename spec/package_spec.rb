@@ -153,7 +153,19 @@ describe DataPackage::Package do
             expect( messages[:warnings] ).to_not be_empty                                          
         end
         
-        it "should check that all files are accessible"
+        it "should check that all files are accessible" do
+            package = DataPackage::Package.new(test_package_filename)
+            messages = package.validate( :datapackage )
+            expect( messages[:errors] ).to be_empty
+                
+            data = JSON.parse( File.read( test_package_filename ) )
+            #refer to missing resource
+            data["resources"][0]["path"] = "oh-dear-its-gone.csv"
+            #point test package at new base dir
+            package = DataPackage::Package.new(data, { :base => File.join( File.dirname(__FILE__), "test-pkg") })
+            messages = package.validate( :datapackage )
+            expect( messages[:errors] ).to_not be_empty                                            
+        end
     end
     
     context "when validating with the simpledataformat profile" do
