@@ -65,6 +65,9 @@
         "image": {
             "type": "string"
         },
+        "bugs": {
+            "type": "string"
+        },
         "maintainers": {
             "type": "array",
             "items": {
