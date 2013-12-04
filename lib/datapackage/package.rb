@@ -34,8 +34,7 @@ module DataPackage
         def base
             #user can override base
             return @opts[:base] if @opts[:base]
-            #no override and no location, so return nil
-            return nil unless @location
+            return "" unless @location
             #work out base directory or uri
             if local?
                 return File.dirname( @location )
@@ -147,11 +146,11 @@ module DataPackage
             prefix = "The package does not include a"
             messages[:warnings] << "#{prefix} 'licenses' property" if licenses.empty?
             messages[:warnings] << "#{prefix} 'datapackage_version' property" unless datapackage_version 
-            messages[:warnings] << "#{prefix} README.md file" unless resource_exists?("README.md")
+            messages[:warnings] << "#{prefix} README.md file" unless resource_exists?( resolve("README.md") )
                 
             resources.each do |resource|
-                if !resource_exists?( resource["path"] )
-                    messages[:errors] << "Resource #{resource["path"]} does not exist"
+                if !resource_exists?( resolve_resource( resource ) )
+                    messages[:errors] << "Resource #{resource["url"] || resource["path"]} does not exist"
                 end
             end
             
@@ -172,15 +171,27 @@ module DataPackage
             return JSON.parse( File.read( schema_file ) )
         end
         
-        def resource_exists?(path)
-            return false unless base
+        def resolve_resource(resource)
+            return resource["url"] || resolve( resource["path"] )
+        end
+        
+        def resolve(path)
             if local?
-                return File.exists?( File.join(base, path) )
+                return File.join( base , path) if base
+                return path
+            else
+                return URI.join(base, path)
+            end
+        end
+        
+        def resource_exists?(location)
+            if !location.to_s.start_with?("http")                
+                return File.exists?( location )
             else
                 begin
-                    status = RestClient.head( URI.join( @location, path) ).code
+                    status = RestClient.head( location ).code
                     return status == 200 
-                rescue
+                rescue => e
                     return false
                 end                
             end

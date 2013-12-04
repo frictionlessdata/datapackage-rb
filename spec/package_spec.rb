@@ -51,7 +51,7 @@ describe DataPackage::Package do
         it "should distinguish between local and remote packages" do
             package = DataPackage::Package.new( { "name" => "test"} )
             expect( package.local? ).to eql(true)
-            expect( package.base ).to eql(nil)
+            expect( package.base ).to eql("")
             
             file = test_package_filename
             package = DataPackage::Package.new(file)
@@ -166,6 +166,21 @@ describe DataPackage::Package do
             messages = package.validate( :datapackage )
             expect( messages[:errors] ).to_not be_empty                                            
         end
+        
+        it "should check resource urls not just resource paths" do
+            FakeWeb.register_uri(:head, "http://example.com/resource.csv", 
+                :body => "data,here" )
+            
+            data = JSON.parse( File.read( test_package_filename ) )
+            #refer to missing resource
+            data["resources"][0].delete("path")
+            data["resources"][0]["url"] = "http://example.com/resource.csv"
+            #point test package at new base dir
+            package = DataPackage::Package.new(data, { :base => File.join( File.dirname(__FILE__), "test-pkg") })
+            messages = package.validate( :datapackage )
+            expect( messages[:errors] ).to be_empty                                                        
+        end
+            
     end
     
     context "when validating with the simpledataformat profile" do
