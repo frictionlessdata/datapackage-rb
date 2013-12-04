@@ -13,7 +13,6 @@ Gem::Specification.new do |s|
   s.files = Dir["{bin,etc,lib}/**/*"] + ["LICENSE.md", "README.md"]
 
   s.add_dependency "json"
-  s.add_dependency "rest-client"
   s.add_dependency "json-schema"
 
   s.add_development_dependency "rspec"
