@@ -117,23 +117,65 @@ module DataPackage
             @package[property] || default
         end
         
-        def valid?(profile=:datapackage)
-            schema = load_schema(profile)
-            JSON::Validator.validate(schema, @package) 
+        def valid?(profile=:datapackage, strict=false)
+            messages = validate( profile ) 
+            return messages[:errors].empty? if !strict
+            return messages[:errors].empty? && messages[:warnings].empty? 
         end
         
         def validate(profile=:datapackage)
-            schema = load_schema(profile)
-            JSON::Validator.fully_validate(schema, @package, :errors_as_objects => true) 
+            return validate_package( validate_with_schema(profile), profile )
         end
         
         private
         
+        def validate_with_schema(profile=:datapackage)
+            schema = load_schema(profile)
+            messages = {
+                :errors => JSON::Validator.fully_validate(schema, @package, :errors_as_objects => true),
+                :warnings => [] 
+            }
+            return messages
+        end
+
+        def validate_package(messages, profile=:datapackage)
+            #not required, but recommended
+            prefix = "The package does not include a"
+            messages[:warnings] << "#{prefix} 'licenses' property" if licenses.empty?
+            messages[:warnings] << "#{prefix} 'datapackage_version' property" unless datapackage_version 
+            messages[:warnings] << "#{prefix} README.md file" unless resource_exists?("README.md")
+            messages
+        end
+                
         def load_schema(profile)
             if @opts[:schema] && @opts[:schema][profile]
+                if !File.exists?( @opts[:schema][profile] )
+                    raise "User supplied schema file does not exist: #{@opts[:schema][profile]}"
+                end                 
                 return JSON.parse( File.read( @opts[:schema][profile] ) )
             end
-            return JSON.parse( File.read( File.join( File.dirname(__FILE__), "..", "..", "etc", "#{profile}-schema.json" ) ) )
+            schema_file = file_in_etc_directory( "#{profile}-schema.json" )
+            if !File.exists?( schema_file )
+                raise "Unable to read schema file #{schema_file} for validation profile #{profile}"
+            end
+            return JSON.parse( File.read( schema_file ) )
+        end
+        
+        def resource_exists?(path)
+            if @location && local?
+                return File.exists?( File.join(base, path) )
+            else
+                begin
+                    status = RestClient.head( URI.join( @location, path) ).code
+                    return status == 200 
+                rescue
+                    return false
+                end                
+            end
+        end
+        
+        def file_in_etc_directory(filename)
+            File.join( File.dirname(__FILE__), "..", "..", "etc", filename )
         end
         
     end
