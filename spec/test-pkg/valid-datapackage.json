@@ -1,0 +1,38 @@
+{
+    "name": "test-package",
+    "title": "Test Package",
+    "licenses": [{
+        "id": "odc-pddl",
+        "url": "http://opendatacommons.org/licenses/pddl/1.0/"    
+        }
+    ],
+    "datapackage_version": "1.0-beta.5",
+    "resources": [
+    {
+        "name": "Test Data",
+        "path": "test.csv",
+        "format": "csv",
+        "mediatype": "text/csv",
+        "encoding": "UTF-8",
+        "dialect": {
+            "delimiter": ",",
+            "lineterminator": "\r\n",
+            "quotechar": "\""
+        },
+        "schema": {
+            "fields": [
+                {
+                  "name": "ID",
+                  "title": "Transaction unique identifier",
+                  "type": "string"
+                },
+                {
+                  "name": "Price",
+                  "title": "Price",
+                  "type": "integer"
+                }
+            ]
+        }
+    }
+    ]
+}
