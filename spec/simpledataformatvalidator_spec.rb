@@ -33,10 +33,12 @@ describe DataPackage::SimpleDataFormatValidator do
         package.resources[0].delete("mediatype")           
         expect( @validator.valid?( package ) ).to be(false)                                        
     end
-            
-    it "should ensure that every CSV file has a header"
-    it "should detect fields missing from CSV file"
-    it "should detect fields missing from schema"
+                        
+    it "should detect fields missing from schema" do
+        package = DataPackage::Package.new(test_package_filename)
+        package.resources[0]["schema"]["fields"].delete_at(0)
+        expect( @validator.valid?( package ) ).to be(false)
+    end
             
     #it "should check encoding of CSV files is UTF-8" 
 

@@ -1,6 +1,7 @@
 require 'date'
 require 'uri'
 require 'net/http'
+require 'csv'
 require 'json'
 require 'json-schema'
 require 'rest-client'

@@ -121,22 +121,55 @@ module DataPackage
             else                
                 if !resource["schema"]
                     messages[:errors] << "#{resource["name"]} does not have a schema"
+                else
+                    messages[:errors] +=
+                        JSON::Validator.fully_validate(@jsontable_schema, 
+                            resource["schema"], :errors_as_objects => true)                                                           
                 end            
-                messages[:errors] +=
-                    JSON::Validator.fully_validate(@jsontable_schema, 
-                        resource["schema"], :errors_as_objects => true)                                       
                 if resource["dialect"]
                     messages[:errors] +=
                         JSON::Validator.fully_validate(@csvddf_schema, 
                             resource["dialect"], :errors_as_objects => true)                                
                 end
+                
+                if resource["schema"] && resource["schema"]["fields"]
+                    fields = resource["schema"]["fields"]
+                    declared_fields = fields.map{ |f| f["name"] }
+                    headers = headers(package, resource)
+                    
+                    #set algebra to finding fields missing from schema and/or CSV file
+                    missing_fields = declared_fields - headers
+                    if missing_fields != []
+                        messages[:errors] << 
+                            "Declared schema has fields not present in CSV file (#{missing_fields.join(",")})"
+                    end
+                    undeclared_fields = headers - declared_fields
+                    if undeclared_fields != []
+                        messages[:errors] << "CSV file has fields missing from schema (#{undeclared_fields.join(",")})"
+                    end                    
+                end
+                
             end
+            
         end
         
         def csv?(resource)
             resource["mediatype"] == "text/csv" ||
             resource["format"] == "csv"       
-        end        
+        end  
+        
+        def headers(package, resource)
+            headers = []
+            opts = dialect_to_csv_options(resource["dialect"])
+            CSV.open( package.resolve_resource(resource), "r", opts) do |csv|
+                headers = csv.shift
+            end
+            return headers
+        end
+                            
+        def dialect_to_csv_options(dialect)
+            return {}
+        end
     end
         
 end
