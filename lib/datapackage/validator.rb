@@ -151,7 +151,7 @@ module DataPackage
                     if resource["schema"] && resource["schema"]["fields"]
                         fields = resource["schema"]["fields"]
                         declared_fields = fields.map{ |f| f["name"] }
-                        headers = headers(package, resource)
+                        headers = headers(package, resource, path)
                         
                         #set algebra to finding fields missing from schema and/or CSV file
                         missing_fields = declared_fields - headers
@@ -177,17 +177,31 @@ module DataPackage
             resource["format"] == "csv"       
         end  
         
-        def headers(package, resource)
+        def headers(package, resource, path)
             headers = []
+            #Using built-in CSV parser here as its more permissive than fastercsv
+            #Lets us provide options to tweak the parsing                
             opts = dialect_to_csv_options(resource["dialect"])
-            CSV.open( package.resolve_resource(resource), "r", opts) do |csv|
-                headers = csv.shift
+            begin
+                CSV.open( package.resolve_resource(resource), "r", opts) do |csv|
+                    headers = csv.shift
+                end
+            rescue => e
+                add_error( :integrity, "Parse error for #{package.resolve_resource(resource)}: #{e}", path)
             end
             return headers
         end
                             
         def dialect_to_csv_options(dialect)
-            return {}
+            return {} unless dialect
+            #supplying defaults here just in case the dialect is invalid
+            delimiter = dialect["delimiter"] || ","
+            delimiter = delimiter + " " if !dialect["skipinitialspace"]  
+            return {
+                :col_sep => delimiter,
+                :row_sep => ( dialect["lineterminator"] || :auto ),
+                :quote_char => ( dialect["quotechar"] || '"')
+            }
         end
         
         private
