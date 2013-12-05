@@ -107,12 +107,35 @@ module DataPackage
     
     #Validator that checks whether a package conforms to the Simple Data Format profile
     class SimpleDataFormatValidator < Validator
+        
         def initialize(schema_name=:datapackage, opts={})
             super(:datapackage, opts)
+            @jsontable_schema = load_schema(:jsontable)
+            @csvddf_schema = load_schema("csvddf-dialect")
         end
         
         def validate_resource(package, resource, messages)
-            #TODO
+            
+            if !csv?(resource)
+                messages[:errors] << "#{resource["name"]} is not a CSV file"
+            else                
+                if !resource["schema"]
+                    messages[:errors] << "#{resource["name"]} does not have a schema"
+                end            
+                messages[:errors] +=
+                    JSON::Validator.fully_validate(@jsontable_schema, 
+                        resource["schema"], :errors_as_objects => true)                                       
+                if resource["dialect"]
+                    messages[:errors] +=
+                        JSON::Validator.fully_validate(@csvddf_schema, 
+                            resource["dialect"], :errors_as_objects => true)                                
+                end
+            end
+        end
+        
+        def csv?(resource)
+            resource["mediatype"] == "text/csv" ||
+            resource["format"] == "csv"       
         end        
     end
         

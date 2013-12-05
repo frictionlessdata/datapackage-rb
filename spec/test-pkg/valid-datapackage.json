@@ -22,7 +22,9 @@
         "dialect": {
             "delimiter": ",",
             "lineterminator": "\r\n",
-            "quotechar": "\""
+            "quotechar": "\"",
+            "doublequote": true,
+            "skipinitialspace": true
         },
         "schema": {
             "fields": [

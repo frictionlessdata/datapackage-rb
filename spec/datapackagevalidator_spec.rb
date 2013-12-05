@@ -3,7 +3,7 @@ require 'spec_helper'
 describe DataPackage::DataPackageValidator do
     
     before(:each) do
-        @validator = DataPackage::DataPackageValidator.new(:datapackage)
+        @validator = DataPackage::DataPackageValidator.new()
     end
     
     it "should distinguish between errors and warnings" do
