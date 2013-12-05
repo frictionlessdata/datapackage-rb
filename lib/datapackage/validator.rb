@@ -106,7 +106,7 @@ module DataPackage
     end
     
     #Validator that checks whether a package conforms to the Simple Data Format profile
-    class SimpleDataFormatValidator < Validator
+    class SimpleDataFormatValidator < DataPackageValidator
         
         def initialize(schema_name=:datapackage, opts={})
             super(:datapackage, opts)
@@ -115,6 +115,7 @@ module DataPackage
         end
         
         def validate_resource(package, resource, messages)
+            super(package, resource, messages)
             
             if !csv?(resource)
                 messages[:errors] << "#{resource["name"]} is not a CSV file"
