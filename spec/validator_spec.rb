@@ -23,7 +23,11 @@ describe DataPackage::Validator do
     
     it "should detect invalid datapackages" do
         package = DataPackage::Package.new( { "name" => "this is invalid" } )
-        expect( @validator.valid?( package ) ).to be(false)            
+        expect( @validator.valid?( package ) ).to be(false)
+        errors = @validator.messages[:errors]
+        errors.each do |msg|
+            expect( msg[:type] ).to eql(:metadata)
+        end
     end
     
     it "should allow user to specify a schema" do

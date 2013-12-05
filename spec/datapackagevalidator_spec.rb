@@ -20,9 +20,15 @@ describe DataPackage::DataPackageValidator do
         messages = @validator.validate( package )
         #missing resources
         expect( messages[:errors].length ).to eql(1)
+        msg = messages[:errors][0]
+        expect( msg[:type] ).to eql(:metadata)
+            
         #missing README
-        #TODO slightly fragile as this will fail if there's a README.md in /tmp
-        expect( messages[:warnings] ).to_not be_empty                         
+        #Note: slightly fragile as this will fail if there's a README.md in /tmp
+        expect( messages[:warnings] ).to_not be_empty
+        msg = messages[:warnings][0]
+        expect( msg[:type] ).to eql(:integrity)
+                                    
     end  
     
     it "should provide warnings about missing useful keys" do

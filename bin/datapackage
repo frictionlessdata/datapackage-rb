@@ -12,23 +12,25 @@ end
 
 package = DataPackage::Package.new(ARGV[0])
 
-messages = package.validate
+messages = package.validate(:simpledataformat)
 
 if messages[:errors].length == 0
-    puts "Package #{package.name} is valid"
+    puts "Package #{package.name} is VALID"
 else
-    puts "Package #{package.name} is invalid"
-    puts "Fix the following errors: "
-    messages[:errors].each_with_index do |error, idx|
-        msg = error[:message] if error.class == Hash
-        msg = error if error.class != Hash
-        puts "#{idx+1}. #{msg}"
-    end        
+    puts "Package #{package.name} is INVALID"
+    puts "Errors: "
+    messages[:errors].each_with_index do |msg, idx|
+        puts "#{idx+1}. #{msg[:type]} error. #{msg[:fragment]}"
+        puts "  #{msg[:message]}"
+    end    
 end
 
 if !messages[:warnings].empty?
     puts "Warnings: "
-    messages[:warnings].each_with_index do |warning, idx|
-        puts "#{idx+1}. #{warning}"
+    messages[:warnings].each_with_index do |msg, idx|
+        puts "#{idx+1}. #{msg[:type]} warning. #{msg[:fragment]}"
+        puts "  #{msg[:message]}"
     end    
 end
+
+exit( messages[:errors].length )
