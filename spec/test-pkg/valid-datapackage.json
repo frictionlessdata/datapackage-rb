@@ -21,7 +21,7 @@
         "encoding": "UTF-8",
         "dialect": {
             "delimiter": ",",
-            "lineterminator": "\r\n",
+            "lineterminator": "\n",
             "quotechar": "\"",
             "doublequote": true,
             "skipinitialspace": true
