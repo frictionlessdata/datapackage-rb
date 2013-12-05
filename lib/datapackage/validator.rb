@@ -139,12 +139,12 @@ module DataPackage
                     add_error(:metadata, "#{resource["name"]} does not have a schema", path )
                 else
                     messages = JSON::Validator.fully_validate(@jsontable_schema, schema, :errors_as_objects => true)
-                    @messages[:errors] += adjust_messages(messages, :metadata, path + "/schema")                                                                                   
+                    @messages[:errors] += adjust_messages(messages, :metadata, path + "/schema/")                                                                                   
                 end  
                           
                 if resource["dialect"]
                     messages = JSON::Validator.fully_validate(@csvddf_schema, resource["dialect"], :errors_as_objects => true)
-                    @messages[:errors] += @messages[:errors] += adjust_messages(messages, :metadata, path + "/dialect")
+                    @messages[:errors] += adjust_messages(messages, :metadata, path + "/dialect")
                 end
                 
                 if package.resource_exists?( package.resolve_resource( resource ) )
