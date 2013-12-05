@@ -17,7 +17,9 @@ Add the gem into your Gemfile:
 
         gem 'datapackage.rb', :git => "git://github.com/theodi/datapackage.rb.git"
 
-Note: gem release to come
+Or:
+
+	sudo gem install datapackage
 
 ## Basic Usage
 
