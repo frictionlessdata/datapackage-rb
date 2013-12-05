@@ -19,9 +19,33 @@ describe DataPackage::Package do
             expect( package.resources.length ).to eql(1)
         end
         
+        it "should support reading properties directly" do
+            package = {
+                "name" => "test-package",
+                "description" => "description",
+                "my-property" => "value"
+            }
+            package = DataPackage::Package.new(package)
+            expect( package.property("my-property") ).to eql("value")
+            expect( package.property("another-property") ).to eql(nil)
+            expect( package.property("another-property", "default") ).to eql("default")
+        end
+        
         it "should load from a local file" do
             package = DataPackage::Package.new( test_package_filename )
             expect( package.name ).to eql("test-package")
+            expect( package.title ).to eql("Test Package")
+            expect( package.description ).to eql("Description")
+            expect( package.homepage ).to eql("http://example.org")
+            expect( package.version ).to eql("0.0.1")
+            [:sources, :maintainers, :publisher, :contributors].each do |key|
+                expect( package.send(key) ).to eql([])
+            end
+            expect( package.dependencies ).to eql(nil)
+            expect( package.sources ).to eql([])
+            expect( package.keywords ).to eql( [ "test", "testing" ] )
+            expect( package.last_modified ).to eql( DateTime.parse("2013-12-05") )
+            expect( package.image ).to eql(nil)                        
             expect( package.resources.length ).to eql(1)            
         end
         
@@ -72,7 +96,8 @@ describe DataPackage::Package do
     context "when validating with the datapackage profile" do
         it "should validate basic datapackage structure" do
             package = DataPackage::Package.new(test_package_filename)
-            expect( package.valid? ).to be(true)            
+            expect( package.valid? ).to be(true)
+            expect( package.valid?(:datapackage, true) ).to be(true)            
         end
         
         it "should detect invalid datapackages" do
@@ -115,17 +140,19 @@ describe DataPackage::Package do
                 "name" => "testing", 
                 "licenses"=>[{"id"=>"", "url"=>""}], 
                 "datapackage_version"=>"" 
-            } )
+            }, { :base => Dir.tmpdir} )
             messages = package.validate( :datapackage )
             #missing resources
             expect( messages[:errors].length ).to eql(1)
             #missing README
+            #TODO slightly fragile as this will fail if there's a README.md in /tmp
             expect( messages[:warnings] ).to_not be_empty                         
         end
                 
         it "should provide warnings about missing useful keys" do
             package = DataPackage::Package.new( { 
-                "name" => "testing" 
+                "name" => "testing",
+                "resources" => [ { "path" => "data.csv" }]
             } )
             messages = package.validate( :datapackage )
             expect( messages[:warnings] ).to_not be_empty                                     
@@ -150,7 +177,7 @@ describe DataPackage::Package do
                                                                        
             package = DataPackage::Package.new( "http://example.com/" )
             messages = package.validate( :datapackage )
-            expect( messages[:warnings] ).to_not be_empty                                          
+            expect( messages[:warnings] ).to_not be_empty                              
         end
         
         it "should check that all files are accessible" do

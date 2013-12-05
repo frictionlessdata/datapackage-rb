@@ -89,7 +89,7 @@ module DataPackage
         end
         
         def last_modified
-            Date.parse @package["last_modified"] 
+            DateTime.parse @package["last_modified"] rescue nil 
         end
         
         def image
@@ -113,10 +113,10 @@ module DataPackage
         end
         
         def dependencies
-            @package["dependencies"] || []
+            @package["dependencies"]
         end
         
-        def property(default=nil)
+        def property(property, default=nil)
             @package[property] || default
         end
         
@@ -177,7 +177,7 @@ module DataPackage
         
         def resolve(path)
             if local?
-                return File.join( base , path) if base
+                return File.join( base , path) if base != ""
                 return path
             else
                 return URI.join(base, path)
