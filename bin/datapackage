@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+$:.unshift File.join( File.dirname(__FILE__), "..", "lib")
+
+require 'datapackage'
+
+
+if ARGV.length == 0
+  puts "Usage: datapackage <location>"
+  puts "<location> should be a datapackage.json file, directory, or url"
+  exit 1
+end
+
+package = DataPackage::Package.new(ARGV[0])
+
+messages = package.validate
+
+if messages[:errors].length == 0
+    puts "Package #{package.name} is valid"
+else
+    puts "Package #{package.name} is invalid"
+    puts "Fix the following errors: "
+    messages[:errors].each_with_index do |error, idx|
+        msg = error[:message] if error.class == Hash
+        msg = error if error.class != Hash
+        puts "#{idx+1}. #{msg}"
+    end        
+end
+
+if !messages[:warnings].empty?
+    puts "Warnings: "
+    messages[:warnings].each_with_index do |warning, idx|
+        puts "#{idx+1}. #{warning}"
+    end    
+end
