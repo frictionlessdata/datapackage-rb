@@ -6,4 +6,5 @@ require 'json-schema'
 require 'rest-client'
 
 require 'datapackage/version'
+require 'datapackage/validator'
 require 'datapackage/package'
