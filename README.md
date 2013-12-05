@@ -15,7 +15,7 @@ The library is intending to support:
 
 Add the gem into your Gemfile:
 
-        gem 'datapackage.rb', :git => "git://github.com/theodi/datapackage.rb.git"
+    gem 'datapackage.rb', :git => "git://github.com/theodi/datapackage.rb.git"
 
 Or:
 
@@ -65,14 +65,21 @@ To expose more detail on errors and warnings:
 
     messages = package.validate() # or package.validate(:datapackage)
 
-This returns an object with two keys: `:errors` and `:warnings`. These are arrays of messages.
+This returns an object with two keys: `:errors` and `:warnings`. The values of these keys are arrays of message object. 
+Message objects are formatted as follows:
 
-Warnings might include notes on missing metadata elements (e.g. package `licenses`) which are not required by the DataPackage specification 
-but which SHOULD be included.
+    {
+        :type => :metadata|:integrity,
+        :message => "message for user",
+        :fragment => "/path/to/responsible/element"
+    }
 
 It is possible to treat all warnings as errors by performing strict validation:
 
     package.valid?(true)
+
+Examples of warnings might include notes on missing metadata elements (e.g. package `licenses`) which are not required by the 
+DataPackage specification but which SHOULD be included.
 
 Warnings are currently generated for:
 
