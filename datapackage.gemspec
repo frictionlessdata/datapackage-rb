@@ -11,7 +11,8 @@ Gem::Specification.new do |s|
   s.homepage    = "http://github.com/theodi/datapackage.rb"
   s.summary     = "Library for working with data packages"
   s.files = Dir["{bin,etc,lib}/**/*"] + ["LICENSE.md", "README.md"]
-
+  s.executables << 'datapackage'
+  
   s.add_dependency "json"
   s.add_dependency "json-schema"
   s.add_dependency "rest-client"
