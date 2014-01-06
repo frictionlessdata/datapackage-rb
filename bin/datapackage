@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 $:.unshift File.join( File.dirname(__FILE__), "..", "lib")
-
+require 'colorize'
 require 'datapackage'
 
 
@@ -14,22 +14,26 @@ package = DataPackage::Package.new(ARGV[0])
 
 messages = package.validate(:simpledataformat)
 
+print "Package #{package.name.colorize(:light_blue)} is "
+
 if messages[:errors].length == 0
-    puts "Package #{package.name} is VALID"
+    puts "VALID".green
 else
-    puts "Package #{package.name} is INVALID"
-    puts "Errors: "
+    puts "INVALID".red
+    puts
+    puts "Errors: ".red
     messages[:errors].each_with_index do |msg, idx|
-        puts "#{idx+1}. #{msg[:type]} error. #{msg[:fragment]}"
-        puts "  #{msg[:message]}"
+        puts "#{idx+1}. #{msg[:type].capitalize.to_s.red} error at #{msg[:fragment]}"
+        puts "   #{msg[:message]}"
     end    
 end
 
+puts
 if !messages[:warnings].empty?
-    puts "Warnings: "
+    puts "Warnings: ".yellow
     messages[:warnings].each_with_index do |msg, idx|
-        puts "#{idx+1}. #{msg[:type]} warning. #{msg[:fragment]}"
-        puts "  #{msg[:message]}"
+        puts "#{idx+1}. #{msg[:type].capitalize.to_s.yellow} warning at #{msg[:fragment]}"
+        puts "   #{msg[:message]}"
     end    
 end
 

@@ -16,8 +16,9 @@ Gem::Specification.new do |s|
   s.add_dependency "json"
   s.add_dependency "json-schema"
   s.add_dependency "rest-client"
+  s.add_dependency "colorize" 
   
   s.add_development_dependency "rspec"
   s.add_development_dependency "simplecov-rcov"
-  s.add_development_dependency "fakeweb", ["~> 1.3"]
+  s.add_development_dependency "fakeweb", "~> 1.3"
 end
