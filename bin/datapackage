@@ -22,7 +22,7 @@ else
     puts "INVALID".red
     puts "Errors: ".red
     messages[:errors].each_with_index do |msg, idx|
-        puts "#{idx+1}. #{msg[:type]} error. #{msg[:fragment]}"
+        puts "#{idx+1}. #{msg[:type].capitalize} error. #{msg[:fragment]}"
         puts "  #{msg[:message]}"
     end    
 end
