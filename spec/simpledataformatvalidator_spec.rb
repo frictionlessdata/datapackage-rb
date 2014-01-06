@@ -31,9 +31,20 @@ describe DataPackage::SimpleDataFormatValidator do
         package = DataPackage::Package.new(test_package_filename)
         package.resources[0].delete("format")
         package.resources[0].delete("mediatype")           
-        expect( @validator.valid?( package ) ).to be(false)                                        
+        expect( @validator.valid?( package ) ).to be(true)                                        
     end
-                        
+
+    it "should correctly identify CSV files" do
+        package = DataPackage::Package.new(test_package_filename)           
+        expect( @validator.csv?( package.resources[0], package ) ).to be(true)                                        
+        package.resources[0].delete("mediatype")                   
+        expect( @validator.csv?( package.resources[0], package ) ).to be(true)                                        
+        package.resources[0].delete("format") 
+        expect( @validator.csv?( package.resources[0], package ) ).to be(true)
+        package.resources[0]["path"] = "foo.txt"
+        expect( @validator.csv?( package.resources[0], package ) ).to be(false)
+    end
+                           
     it "should detect fields missing from schema" do
         package = DataPackage::Package.new(test_package_filename)
         package.resources[0]["schema"]["fields"].delete_at(0)

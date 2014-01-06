@@ -131,7 +131,11 @@ module DataPackage
         def validate_resource(package, resource, path)
             super(package, resource, path)
             
-            if !csv?(resource)
+            if !resource["mediatype"] && !resource["format"]
+              add_warning(:metadata, "#{resource["name"]} does not specify either a mediatype or format", path )
+            end
+              
+            if !csv?(resource, package)
                 add_error(:integrity, "#{resource["name"]} is not a CSV file", path )
             else  
                 schema = resource["schema"]              
@@ -139,7 +143,7 @@ module DataPackage
                     add_error(:metadata, "#{resource["name"]} does not have a schema", path )
                 else
                     messages = JSON::Validator.fully_validate(@jsontable_schema, schema, :errors_as_objects => true)
-                    @messages[:errors] += adjust_messages(messages, :metadata, path + "/schema/")                                                                                   
+                    @messages[:errors] += adjust_messages(messages, :metadata, path + "/schema/")
                 end  
                           
                 if resource["dialect"]
@@ -172,9 +176,10 @@ module DataPackage
             
         end
                 
-        def csv?(resource)
+        def csv?(resource, package)
             resource["mediatype"] == "text/csv" ||
-            resource["format"] == "csv"       
+            resource["format"] == "csv" || 
+            package.resolve_resource(resource).split(".").last == "csv"
         end  
         
         def headers(package, resource, path)
