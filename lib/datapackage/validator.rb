@@ -154,7 +154,10 @@ module DataPackage
                 if package.resource_exists?( package.resolve_resource( resource ) )
                     if resource["schema"] && resource["schema"]["fields"]
                         fields = resource["schema"]["fields"]
-                        declared_fields = fields.map{ |f| f["name"] }
+                        declared_fields = fields.map{ |f| f["name"] }.compact
+                        if declared_fields == []
+                          add_error(:metadata, "Schema does not declare any named fields", path + "/schema/fields")
+                        end
                         headers = headers(package, resource, path)
                         
                         #set algebra to finding fields missing from schema and/or CSV file
