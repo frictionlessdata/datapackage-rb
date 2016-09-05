@@ -3,7 +3,6 @@ require 'spec_helper'
 describe DataPackage::Registry do
 
 
-
   it 'accepts urls' do
     url = 'http://some-place.com/registry.csv'
     csv = [
@@ -25,7 +24,18 @@ describe DataPackage::Registry do
   end
 
   it 'has a default registry url' do
-    pending
+    url = 'http://schemas.datapackages.org/registry.csv'
+
+    csv = [
+      "id,title,schema,specification",
+      "base,Data Package,http://example.com/one.json,http://example.com"
+    ]
+
+    FakeWeb.register_uri(:get, url, :body => csv.join("\r\n"))
+
+    registry = DataPackage::Registry.new()
+
+    expect(registry.available_profiles.values.count).to eq(1)
   end
 
   context 'raises an error' do

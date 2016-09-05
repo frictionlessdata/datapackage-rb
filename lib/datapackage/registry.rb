@@ -4,7 +4,9 @@ module DataPackage
 
   class Registry
 
-    def initialize(registry_path_or_url)
+    DEFAULT_REGISTRY_URL = 'http://schemas.datapackages.org/registry.csv'
+
+    def initialize(registry_path_or_url = DEFAULT_REGISTRY_URL)
       @profiles = []
       @registry = get_registry(registry_path_or_url)
     end
