@@ -136,7 +136,8 @@ describe DataPackage::Registry do
     end
 
     it 'cannot be set' do
-      pending
+      registry = DataPackage::Registry.new(@base_and_tabular_registry_path)
+      expect { registry.available_profiles = {} }.to raise_error(NoMethodError)
     end
 
     it 'works with unicode strings' do
