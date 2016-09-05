@@ -70,7 +70,7 @@ describe DataPackage::Registry do
       }.to raise_error(DataPackage::RegistryError)
     end
 
-    it 'registry path does not exist' do
+    it 'registry url does not exist' do
       url = 'http://some-place.com/registry.txt'
 
       FakeWeb.register_uri(:get, url, :body => "", :status => ["404", "Not Found"])
@@ -78,6 +78,10 @@ describe DataPackage::Registry do
       expect {
         DataPackage::Registry.new(url)
       }.to raise_error(DataPackage::RegistryError)
+    end
+
+    if 'registry path does not exist' do
+      pending
     end
 
   end
