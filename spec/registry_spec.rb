@@ -61,11 +61,23 @@ describe DataPackage::Registry do
     end
 
     it 'if registry webserver raises error' do
-      pending
+      url = 'http://some-place.com/registry.txt'
+
+      FakeWeb.register_uri(:get, url, :body => "", :status => ["500", "Internal Server Error"])
+
+      expect {
+        DataPackage::Registry.new(url)
+      }.to raise_error(DataPackage::RegistryError)
     end
 
     it 'registry path does not exist' do
-      pending
+      url = 'http://some-place.com/registry.txt'
+
+      FakeWeb.register_uri(:get, url, :body => "", :status => ["404", "Not Found"])
+
+      expect {
+        DataPackage::Registry.new(url)
+      }.to raise_error(DataPackage::RegistryError)
     end
 
   end

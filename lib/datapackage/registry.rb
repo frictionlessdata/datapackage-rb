@@ -32,7 +32,7 @@ module DataPackage
           registry = csv.map {|row| { "#{row.fetch(:id)}" => row.to_h }  }.first
           raise(RegistryError) if registry.nil?
           registry
-        rescue KeyError
+        rescue KeyError, OpenURI::HTTPError
           raise(RegistryError)
         end
       end
