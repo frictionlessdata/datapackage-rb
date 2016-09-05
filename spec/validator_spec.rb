@@ -46,13 +46,19 @@ describe DataPackage::Validator do
                         :datapackage => File.join( 
                             File.dirname(__FILE__), "..", "etc", "does-not-exist.json") 
                       }})            
-        expect { @validator.valid?( package ) }.to raise_error                
+        expect { @validator.valid?( package ) }.to raise_error(
+          RuntimeError,
+          /User-supplied schema file does not exist/
+        )
     end
     
     it "should raise an exception for unknown profiles" do
         package = DataPackage::Package.new(test_package_filename)
         @validator = DataPackage::Validator.new(:unknown)
-        expect { @validator.valid?( package ) }.to raise_error            
+        expect { @validator.valid?( package ) }.to raise_error(
+          RuntimeError,
+          /Unable to read schema file/
+        )
     end
       
 end
