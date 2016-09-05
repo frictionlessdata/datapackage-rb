@@ -231,7 +231,8 @@ describe DataPackage::Registry do
     end
 
     it 'returns nil if profile does not exist' do
-      pending
+      registry = DataPackage::Registry.new
+      expect(registry.get('non-existent-profile')).to be_nil
     end
 
     it 'memoizes the profiles' do
