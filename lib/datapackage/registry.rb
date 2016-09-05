@@ -32,7 +32,7 @@ module DataPackage
 
         path = get_absolute_path(profile_metadata[:schema_path])
 
-        if File.file?(path)
+        if path && File.file?(path)
           load_json(path)
         else
           url = profile_metadata[:schema]
@@ -62,12 +62,14 @@ module DataPackage
 
       def get_absolute_path(relative_path)
         File.join(@base_path, relative_path)
+      rescue TypeError
+        nil
       end
 
       def load_json(path)
         json = open(path).read
         JSON.parse(json)
-      rescue JSON::ParserError
+      rescue JSON::ParserError, OpenURI::HTTPError
         raise RegistryError
       end
 
