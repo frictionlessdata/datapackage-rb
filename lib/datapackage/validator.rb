@@ -59,8 +59,8 @@ module DataPackage
         def load_schema(profile)
             if @opts[:schema] && @opts[:schema][profile]
                 if !File.exists?( @opts[:schema][profile] )
-                    raise "User supplied schema file does not exist: #{@opts[:schema][profile]}"
-                end                 
+                    raise "User-supplied schema file does not exist: #{@opts[:schema][profile]}"
+                end
                 return JSON.parse( File.read( @opts[:schema][profile] ) )
             end
             schema_file = file_in_etc_directory( "#{profile}-schema.json" )
