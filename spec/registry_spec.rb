@@ -153,7 +153,11 @@ describe DataPackage::Registry do
   context 'get' do
 
     it 'loads profile from disk' do
-      pending
+      registry = DataPackage::Registry.new(@base_and_tabular_registry_path)
+
+      base_profile = registry.get('base')
+      expect(base_profile).to_not eq(nil)
+      expect(base_profile['title']).to eq('base_profile')
     end
 
     it 'loads remote file if local copy does not exist' do
