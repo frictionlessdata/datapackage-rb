@@ -2,68 +2,150 @@ require 'spec_helper'
 
 describe DataPackage::Registry do
 
-
-
-  it 'accepts urls' do
-    url = 'http://some-place.com/registry.csv'
-    csv = [
-      "id,title,schema,specification",
-      "base,Data Package,http://example.com/one.json,http://example.com"
-    ]
-
-    FakeWeb.register_uri(:get, url, :body => csv.join("\r\n"))
-
-    registry = DataPackage::Registry.new(url)
-
-    expect(registry.available_profiles.values.count).to eq(1)
-    expect(registry.available_profiles['base']).to eq({
-        id: 'base',
-        title: 'Data Package',
-        schema: 'http://example.com/one.json',
-        specification: 'http://example.com'
-    })
+  before(:each) do
+    @base_registry_path = File.join('spec', 'fixtures', 'base_registry.csv')
+    @empty_registry_path = File.join('spec', 'fixtures', 'empty_registry.csv')
+    @base_and_tabular_registry_path = File.join('spec', 'fixtures', 'base_and_tabular_registry.csv')
+    @unicode_registry_path = File.join('spec', 'fixtures', 'unicode_registry.csv')
+    @base_profile_path = File.join('spec', 'fixtures', 'base_profile.json')
   end
 
-  it 'has a default registry url' do
-    pending
+  context 'initialize' do
+
+    before(:each) do
+      @url = 'http://some-place.com/registry.csv'
+      @body = File.read(@base_registry_path)
+    end
+
+    it 'accepts urls' do
+      FakeWeb.register_uri(:get, @url, :body => @body)
+
+      registry = DataPackage::Registry.new(@url)
+
+      expect(registry.available_profiles.values.count).to eq(1)
+      expect(registry.available_profiles['base']).to eq({
+          id: 'base',
+          title: 'Data Package',
+          schema: 'http://example.com/one.json',
+          specification: 'http://example.com'
+      })
+    end
+
+    it 'has a default registry url' do
+      default_url = 'http://schemas.datapackages.org/registry.csv'
+
+      FakeWeb.register_uri(:get, default_url, :body => @body)
+
+      registry = DataPackage::Registry.new()
+
+      expect(registry.available_profiles.values.count).to eq(1)
+    end
+
+    it 'accepts a path' do
+      registry = DataPackage::Registry.new(@base_registry_path)
+
+      expect(registry.available_profiles.values.count).to eq(1)
+      expect(registry.available_profiles['base']).to eq({
+          id: 'base',
+          title: 'Data Package',
+          schema: 'http://example.com/one.json',
+          specification: 'http://example.com'
+      })
+    end
+
   end
 
   context 'raises an error' do
 
     it 'if registry is not a CSV' do
-      pending
+      url = 'http://some-place.com/registry.txt'
+
+      FakeWeb.register_uri(:get, url, :body => "foo")
+
+      expect {
+        DataPackage::Registry.new(url)
+      }.to raise_error(DataPackage::RegistryError)
     end
 
     it 'if registry has no ID field' do
-      pending
+      url = 'http://some-place.com/registry.txt'
+
+      FakeWeb.register_uri(:get, url, :body => "foo\nbar")
+
+      expect {
+        DataPackage::Registry.new(url)
+      }.to raise_error(DataPackage::RegistryError)
     end
 
     it 'if registry webserver raises error' do
-      pending
+      url = 'http://some-place.com/registry.txt'
+
+      FakeWeb.register_uri(:get, url, :body => "", :status => ["500", "Internal Server Error"])
+
+      expect {
+        DataPackage::Registry.new(url)
+      }.to raise_error(DataPackage::RegistryError)
+    end
+
+    it 'registry url does not exist' do
+      url = 'http://some-place.com/registry.txt'
+
+      FakeWeb.register_uri(:get, url, :body => "", :status => ["404", "Not Found"])
+
+      expect {
+        DataPackage::Registry.new(url)
+      }.to raise_error(DataPackage::RegistryError)
     end
 
     it 'registry path does not exist' do
-      pending
+      path = "some/fake/path/file.csv"
+
+      expect {
+        DataPackage::Registry.new(path)
+      }.to raise_error(DataPackage::RegistryError)
     end
 
   end
 
   context 'available profiles' do
 
-    it 'available profiles returns empty array when registry is empty' do
-      pending
+    it 'available profiles returns empty hash when registry is empty' do
+      registry = DataPackage::Registry.new(@empty_registry_path)
+
+      expect(registry.available_profiles).to eq({})
     end
 
     it 'returns list of profiles' do
-      pending
+      registry = DataPackage::Registry.new(@base_and_tabular_registry_path)
+
+      expect(registry.available_profiles.values.count).to eq(2)
+      expect(registry.available_profiles['base']).to eq({
+          id: 'base',
+          title: 'Data Package',
+          schema: 'http://example.com/one.json',
+          schema_path: 'base_profile.json',
+          specification: 'http://example.com'
+      })
+      expect(registry.available_profiles['tabular']).to eq({
+          id: 'tabular',
+          title: 'Tabular Data Package',
+          schema: 'http://example.com/two.json',
+          schema_path: 'tabular_profile.json',
+          specification: 'http://example.com'
+      })
     end
 
     it 'cannot be set' do
-      pending
+      registry = DataPackage::Registry.new(@base_and_tabular_registry_path)
+      expect { registry.available_profiles = {} }.to raise_error(NoMethodError)
     end
 
     it 'works with unicode strings' do
-      pending
+      registry = DataPackage::Registry.new(@unicode_registry_path)
+
+      expect(registry.available_profiles.values.count).to eq(2)
+      base_profile_metadata = registry.available_profiles['base']
+      expect(base_profile_metadata[:title]).to eq('Iñtërnâtiônàlizætiøn')
     end
 
   end
