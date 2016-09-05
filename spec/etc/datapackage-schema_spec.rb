@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe "DataPackage Schema" do
     
     before(:all) do

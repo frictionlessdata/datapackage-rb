@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe "CSVDDF Dialect Schema" do
     
     before(:all) do

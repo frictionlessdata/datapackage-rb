@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe "JSON Table Schema" do
     
     before(:all) do

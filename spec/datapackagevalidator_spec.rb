@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe DataPackage::DataPackageValidator do
     
     before(:each) do

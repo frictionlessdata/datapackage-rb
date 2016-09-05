@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe DataPackage::Package do
     
     before(:each) do

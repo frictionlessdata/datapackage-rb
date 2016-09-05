@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe DataPackage::SimpleDataFormatValidator do
     
     before(:each) do
