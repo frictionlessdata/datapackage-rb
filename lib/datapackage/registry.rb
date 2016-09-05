@@ -27,12 +27,13 @@ module DataPackage
       end
 
       def get_registry(registry_path_or_url)
-        csv = CSV.new(open(registry_path_or_url), headers: :first_row, header_converters: :symbol)
-        registry = csv.map {|row| { "#{row[:id]}" => row.to_h }  }.first
-        if registry.nil?
-          raise(RegistryError)
-        else
+        begin
+          csv = CSV.new(open(registry_path_or_url), headers: :first_row, header_converters: :symbol)
+          registry = csv.map {|row| { "#{row.fetch(:id)}" => row.to_h }  }.first
+          raise(RegistryError) if registry.nil?
           registry
+        rescue KeyError
+          raise(RegistryError)
         end
       end
 

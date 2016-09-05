@@ -51,7 +51,13 @@ describe DataPackage::Registry do
     end
 
     it 'if registry has no ID field' do
-      pending
+      url = 'http://some-place.com/registry.txt'
+
+      FakeWeb.register_uri(:get, url, :body => "foo\nbar")
+
+      expect {
+        DataPackage::Registry.new(url)
+      }.to raise_error(DataPackage::RegistryError)
     end
 
     it 'if registry webserver raises error' do
