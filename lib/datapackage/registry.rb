@@ -29,7 +29,11 @@ module DataPackage
       def get_registry(registry_path_or_url)
         csv = CSV.new(open(registry_path_or_url), headers: :first_row, header_converters: :symbol)
         registry = csv.map {|row| { "#{row[:id]}" => row.to_h }  }.first
-        registry
+        if registry.nil?
+          raise(RegistryError)
+        else
+          registry
+        end
       end
 
       def get_absolute_path(relative_path)

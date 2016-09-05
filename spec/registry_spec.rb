@@ -41,7 +41,13 @@ describe DataPackage::Registry do
   context 'raises an error' do
 
     it 'if registry is not a CSV' do
-      pending
+      url = 'http://some-place.com/registry.txt'
+
+      FakeWeb.register_uri(:get, url, :body => "foo")
+
+      expect {
+        DataPackage::Registry.new(url)
+      }.to raise_error(DataPackage::RegistryError)
     end
 
     it 'if registry has no ID field' do
