@@ -2,53 +2,50 @@ require 'spec_helper'
 
 describe DataPackage::Registry do
 
-  it 'accepts urls' do
-    url = 'http://some-place.com/registry.csv'
-    csv = [
-      "id,title,schema,specification",
-      "base,Data Package,http://example.com/one.json,http://example.com"
-    ]
+  context 'initialize' do
 
-    FakeWeb.register_uri(:get, url, :body => csv.join("\r\n"))
+    before(:each) do
+      @url = 'http://some-place.com/registry.csv'
+      @path = File.join('spec', 'fixtures', 'base_registry.csv')
+      @body = File.read(@path)
+    end
 
-    registry = DataPackage::Registry.new(url)
+    it 'accepts urls' do
+      FakeWeb.register_uri(:get, @url, :body => @body)
 
-    expect(registry.available_profiles.values.count).to eq(1)
-    expect(registry.available_profiles['base']).to eq({
-        id: 'base',
-        title: 'Data Package',
-        schema: 'http://example.com/one.json',
-        specification: 'http://example.com'
-    })
-  end
+      registry = DataPackage::Registry.new(@url)
 
-  it 'has a default registry url' do
-    url = 'http://schemas.datapackages.org/registry.csv'
+      expect(registry.available_profiles.values.count).to eq(1)
+      expect(registry.available_profiles['base']).to eq({
+          id: 'base',
+          title: 'Data Package',
+          schema: 'http://example.com/one.json',
+          specification: 'http://example.com'
+      })
+    end
 
-    csv = [
-      "id,title,schema,specification",
-      "base,Data Package,http://example.com/one.json,http://example.com"
-    ]
+    it 'has a default registry url' do
+      default_url = 'http://schemas.datapackages.org/registry.csv'
 
-    FakeWeb.register_uri(:get, url, :body => csv.join("\r\n"))
+      FakeWeb.register_uri(:get, default_url, :body => @body)
 
-    registry = DataPackage::Registry.new()
+      registry = DataPackage::Registry.new()
 
-    expect(registry.available_profiles.values.count).to eq(1)
-  end
+      expect(registry.available_profiles.values.count).to eq(1)
+    end
 
-  it 'accepts a path' do
-    path = File.join('spec', 'fixtures', 'base_registry.csv')
+    it 'accepts a path' do
+      registry = DataPackage::Registry.new(@path)
 
-    registry = DataPackage::Registry.new(path)
+      expect(registry.available_profiles.values.count).to eq(1)
+      expect(registry.available_profiles['base']).to eq({
+          id: 'base',
+          title: 'Data Package',
+          schema: 'http://example.com/one.json',
+          specification: 'http://example.com'
+      })
+    end
 
-    expect(registry.available_profiles.values.count).to eq(1)
-    expect(registry.available_profiles['base']).to eq({
-        id: 'base',
-        title: 'Data Package',
-        schema: 'http://example.com/one.json',
-        specification: 'http://example.com'
-    })
   end
 
   context 'raises an error' do
