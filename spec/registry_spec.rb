@@ -2,7 +2,6 @@ require 'spec_helper'
 
 describe DataPackage::Registry do
 
-
   it 'accepts urls' do
     url = 'http://some-place.com/registry.csv'
     csv = [
@@ -36,6 +35,20 @@ describe DataPackage::Registry do
     registry = DataPackage::Registry.new()
 
     expect(registry.available_profiles.values.count).to eq(1)
+  end
+
+  it 'accepts a path' do
+    path = File.join('spec', 'fixtures', 'base_registry.csv')
+
+    registry = DataPackage::Registry.new(path)
+
+    expect(registry.available_profiles.values.count).to eq(1)
+    expect(registry.available_profiles['base']).to eq({
+        id: 'base',
+        title: 'Data Package',
+        schema: 'http://example.com/one.json',
+        specification: 'http://example.com'
+    })
   end
 
   context 'raises an error' do
@@ -80,8 +93,12 @@ describe DataPackage::Registry do
       }.to raise_error(DataPackage::RegistryError)
     end
 
-    if 'registry path does not exist' do
-      pending
+    it 'registry path does not exist' do
+      path = "some/fake/path/file.csv"
+
+      expect {
+        DataPackage::Registry.new(path)
+      }.to raise_error(DataPackage::RegistryError)
     end
 
   end
