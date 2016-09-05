@@ -141,7 +141,11 @@ describe DataPackage::Registry do
     end
 
     it 'works with unicode strings' do
-      pending
+      registry = DataPackage::Registry.new(@unicode_registry_path)
+
+      expect(registry.available_profiles.values.count).to eq(2)
+      base_profile_metadata = registry.available_profiles['base']
+      expect(base_profile_metadata[:title]).to eq('Iñtërnâtiônàlizætiøn')
     end
 
   end
