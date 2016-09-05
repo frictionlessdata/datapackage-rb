@@ -110,7 +110,9 @@ describe DataPackage::Registry do
   context 'available profiles' do
 
     it 'available profiles returns empty hash when registry is empty' do
+      registry = DataPackage::Registry.new(@empty_registry_path)
 
+      expect(registry.available_profiles).to eq({})
     end
 
     it 'returns list of profiles' do

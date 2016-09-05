@@ -28,12 +28,20 @@ module DataPackage
 
       def get_registry(registry_path_or_url)
         begin
-          csv = CSV.new(open(registry_path_or_url), headers: :first_row, header_converters: :symbol)
-          registry = csv.map {|row| { "#{row.fetch(:id)}" => row.to_h }  }.first
-          raise(RegistryError) if registry.nil?
-          registry
+          csv = parse_csv(registry_path_or_url)
+          registry = csv.map {|row| { "#{row.fetch(:id)}" => row.to_h }  }.first || {}
         rescue KeyError, OpenURI::HTTPError, Errno::ENOENT
           raise(RegistryError)
+        end
+        registry
+      end
+
+      def parse_csv(path_or_url)
+        csv = open(path_or_url).read
+        if csv.match(/,/)
+          CSV.new(csv, headers: :first_row, header_converters: :symbol)
+        else
+          raise RegistryError
         end
       end
 
