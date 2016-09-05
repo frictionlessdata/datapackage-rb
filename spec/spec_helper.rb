@@ -1,11 +1,8 @@
-require 'simplecov'
-require 'simplecov-rcov'
+require 'coveralls'
+Coveralls.wear!
 require 'fakeweb'
-SimpleCov.formatter = SimpleCov::Formatter::RcovFormatter
-SimpleCov.start
 
 require 'datapackage'
-require 'fakeweb'
 
 RSpec.configure do |config|
   config.order = "random"
