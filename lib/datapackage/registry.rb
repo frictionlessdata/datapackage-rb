@@ -31,7 +31,7 @@ module DataPackage
         return if profile_metadata.nil?
 
         path = get_absolute_path(profile_metadata[:schema_path])
-        
+
         if File.file?(path)
           load_json(path)
         else
@@ -67,6 +67,8 @@ module DataPackage
       def load_json(path)
         json = open(path).read
         JSON.parse(json)
+      rescue JSON::ParserError
+        raise RegistryError
       end
 
   end

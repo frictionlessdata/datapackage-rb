@@ -185,7 +185,10 @@ describe DataPackage::Registry do
     context 'raises an error' do
 
       it 'if profile is not json' do
-        pending
+        registry_path = File.join('spec', 'fixtures', 'registry_with_notajson_profile.csv')
+        registry = DataPackage::Registry.new(registry_path)
+
+        expect { registry.get('notajson') }.to raise_error(DataPackage::RegistryError)
       end
 
       it 'remote profile file does not exist' do
