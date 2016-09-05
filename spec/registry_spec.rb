@@ -2,12 +2,19 @@ require 'spec_helper'
 
 describe DataPackage::Registry do
 
+  before(:each) do
+    @base_registry_path = File.join('spec', 'fixtures', 'base_registry.csv')
+    @empty_registry_path = File.join('spec', 'fixtures', 'empty_registry.csv')
+    @base_and_tabular_registry_path = File.join('spec', 'fixtures', 'base_and_tabular_registry.csv')
+    @unicode_registry_path = File.join('spec', 'fixtures', 'unicode_registry.csv')
+    @base_profile_path = File.join('spec', 'fixtures', 'base_profile.json')
+  end
+
   context 'initialize' do
 
     before(:each) do
       @url = 'http://some-place.com/registry.csv'
-      @path = File.join('spec', 'fixtures', 'base_registry.csv')
-      @body = File.read(@path)
+      @body = File.read(@base_registry_path)
     end
 
     it 'accepts urls' do
@@ -35,7 +42,7 @@ describe DataPackage::Registry do
     end
 
     it 'accepts a path' do
-      registry = DataPackage::Registry.new(@path)
+      registry = DataPackage::Registry.new(@base_registry_path)
 
       expect(registry.available_profiles.values.count).to eq(1)
       expect(registry.available_profiles['base']).to eq({
@@ -102,8 +109,8 @@ describe DataPackage::Registry do
 
   context 'available profiles' do
 
-    it 'available profiles returns empty array when registry is empty' do
-      pending
+    it 'available profiles returns empty hash when registry is empty' do
+
     end
 
     it 'returns list of profiles' do
