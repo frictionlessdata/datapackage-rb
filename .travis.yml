@@ -1,14 +1,5 @@
 rvm:
-- 1.9.3
-- 2.0.0
-- 2.3.1
+  - 2.0.0
+  - 2.3.1
 before_install:
   - gem update bundler
-notifications:
-  irc:
-    channels:
-      - "irc.freenode.net#theodi"
-    template:
-      - "%{repository} %{branch} - %{message} %{build_url}"
-    on_success: change
-    on_failure: always
