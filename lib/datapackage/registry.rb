@@ -29,7 +29,8 @@ module DataPackage
       def get_registry(registry_path_or_url)
         begin
           csv = parse_csv(registry_path_or_url)
-          registry = csv.map {|row| { "#{row.fetch(:id)}" => row.to_h }  }.first || {}
+          registry = {}
+          csv.each { |row| registry[row.fetch(:id)] = row.to_h } 
         rescue KeyError, OpenURI::HTTPError, Errno::ENOENT
           raise(RegistryError)
         end

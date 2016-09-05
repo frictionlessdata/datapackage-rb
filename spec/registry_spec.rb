@@ -116,7 +116,23 @@ describe DataPackage::Registry do
     end
 
     it 'returns list of profiles' do
-      pending
+      registry = DataPackage::Registry.new(@base_and_tabular_registry_path)
+
+      expect(registry.available_profiles.values.count).to eq(2)
+      expect(registry.available_profiles['base']).to eq({
+          id: 'base',
+          title: 'Data Package',
+          schema: 'http://example.com/one.json',
+          schema_path: 'base_profile.json',
+          specification: 'http://example.com'
+      })
+      expect(registry.available_profiles['tabular']).to eq({
+          id: 'tabular',
+          title: 'Tabular Data Package',
+          schema: 'http://example.com/two.json',
+          schema_path: 'tabular_profile.json',
+          specification: 'http://example.com'
+      })
     end
 
     it 'cannot be set' do
