@@ -31,7 +31,8 @@ module DataPackage
         return if profile_metadata.nil?
 
         path = get_absolute_path(profile_metadata[:schema_path])
-        if path
+        
+        if File.file?(path)
           load_json(path)
         else
           url = profile_metadata[:schema]

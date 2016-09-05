@@ -161,7 +161,25 @@ describe DataPackage::Registry do
     end
 
     it 'loads remote file if local copy does not exist' do
-      pending
+      body = [
+        'id,title,schema,specification,schema_path',
+        'base,Data Package,http://example.com/one.json,http://example.com,inexistent.json'
+      ].join("\r\n")
+
+      profile_url = 'http://example.com/one.json'
+      profile_body = '{ "title": "base_profile" }'
+
+      FakeWeb.register_uri(:get, profile_url, :body => profile_body)
+
+      tempfile = Tempfile.new('.csv')
+      tempfile.write(body)
+      tempfile.rewind
+
+      registry = DataPackage::Registry.new(tempfile.path)
+
+      base_profile = registry.get('base')
+      expect(base_profile).to_not eq(nil)
+      expect(base_profile['title']).to eq('base_profile')
     end
 
     context 'raises an error' do
