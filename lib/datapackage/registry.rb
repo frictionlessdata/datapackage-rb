@@ -12,12 +12,12 @@ module DataPackage
           File.absolute_path(registry_path_or_url)
         )
       end
-      @profiles = []
+      @profiles = {}
       @registry = get_registry(registry_path_or_url)
     end
 
     def get(profile_id)
-      profile = get_profile(profile_id)
+      @profiles[profile_id] ||= get_profile(profile_id)
     end
 
     def available_profiles

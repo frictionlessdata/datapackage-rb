@@ -236,7 +236,13 @@ describe DataPackage::Registry do
     end
 
     it 'memoizes the profiles' do
-      pending
+      registry = DataPackage::Registry.new(@base_and_tabular_registry_path)
+
+      base = registry.get('base')
+
+      expect(registry).to_not receive(:get_profile).with('base')
+
+      expect(registry.get('base')).to eq(base)
     end
 
   end
