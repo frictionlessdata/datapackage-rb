@@ -256,7 +256,13 @@ describe DataPackage::Registry do
     end
 
     it 'uses received registry base path' do
-      skip
+      registry = DataPackage::Registry.new(@empty_registry_path)
+
+      base_path = File.dirname(
+        File.absolute_path(@empty_registry_path)
+      )
+
+      expect(registry.base_path).to eq(base_path)
     end
 
     it 'is none if registry is remote' do
