@@ -266,7 +266,14 @@ describe DataPackage::Registry do
     end
 
     it 'is none if registry is remote' do
-      skip
+      url = 'http://some-place.com/registry.csv'
+      body = File.read(@base_registry_path)
+
+      FakeWeb.register_uri(:get, url, :body => body)
+
+      registry = DataPackage::Registry.new(url)
+
+      expect(registry.base_path).to be_nil
     end
 
     it 'cannot be set' do
