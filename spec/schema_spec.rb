@@ -8,27 +8,31 @@ describe DataPackage::Schema do
       }
       schema = DataPackage::Schema.new(schema_hash)
 
-      expect(schema.schema).to eq(schema_hash)
-      expect(schema.schema['foo']).to eq(schema_hash['foo'])
+      expect(schema).to eq(schema_hash)
+      expect(schema['foo']).to eq(schema_hash['foo'])
     end
 
     it 'loads a schema from a path' do
-      path = File.join('spec', 'fixtures', 'empty_schema.json')
+      path = File.join('spec', 'fixtures', 'fake_schema.json')
 
       schema = DataPackage::Schema.new(path)
 
-      expect(schema.schema).to eq({})
+      expect(schema).to eq ({
+        'key' => 'value'
+      })
     end
 
     it 'loads a schema from a url' do
       url = 'http://example.org/thing.json'
-      body = File.read File.join('spec', 'fixtures', 'empty_schema.json')
+      body = File.read File.join('spec', 'fixtures', 'fake_schema.json')
 
       FakeWeb.register_uri(:get, url, :body => body)
 
       schema = DataPackage::Schema.new(url)
 
-      expect(schema.schema).to eq({})
+      expect(schema).to eq ({
+        'key' => 'value'
+      })
     end
 
     it 'loads a schema from the registry'

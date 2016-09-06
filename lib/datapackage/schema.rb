@@ -1,13 +1,13 @@
 module DataPackage
-  class Schema
+  class Schema < Hash
 
     attr_reader :schema
 
     def initialize(schema)
       if schema.class == Hash
-        @schema = schema
+        self.merge! schema
       else
-        @schema = load_schema(schema)
+        self.merge! load_schema(schema)
       end
     end
 
