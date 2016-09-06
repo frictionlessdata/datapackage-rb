@@ -35,13 +35,33 @@ describe DataPackage::Schema do
       })
     end
 
-    it 'loads a schema from the registry'
+    it 'loads a schema from the registry' do
+      schema = DataPackage::Schema.new(:base)
+
+      expected = JSON.parse(File.read File.join File.dirname(__FILE__), '..', 'datapackage', 'schemas', 'data-package.json')
+      expect(schema).to eq expected
+    end
 
     context 'raises an error' do
 
-      it 'when the path does not exist'
+      it 'when the path does not exist' do
+        path = File.join('spec', 'fixtures', 'not_a_path.json')
 
-      it 'when the path is no json'
+        expect { DataPackage::Schema.new(path) }.to raise_exception { |exception|
+          expect(exception).to be_a DataPackage::SchemaException
+          expect(exception.status).to eq ("Path 'spec/fixtures/not_a_path.json' does not exist")
+        }
+
+      end
+
+      it 'when the path is not json' do
+        path = File.join('spec', 'fixtures', 'not_a_json')
+
+        expect { DataPackage::Schema.new(path) }.to raise_exception { |exception|
+          expect(exception).to be_a DataPackage::SchemaException
+          expect(exception.status).to eq ("Schema is not valid JSON")
+        }
+      end
 
       it 'when the url is not json'
 
