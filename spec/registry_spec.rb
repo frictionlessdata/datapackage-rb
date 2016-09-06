@@ -153,31 +153,86 @@ describe DataPackage::Registry do
   context 'get' do
 
     it 'loads profile from disk' do
-      pending
+      registry = DataPackage::Registry.new(@base_and_tabular_registry_path)
+
+      base_profile = registry.get('base')
+      expect(base_profile).to_not eq(nil)
+      expect(base_profile['title']).to eq('base_profile')
     end
 
     it 'loads remote file if local copy does not exist' do
-      pending
+      body = [
+        'id,title,schema,specification,schema_path',
+        'base,Data Package,http://example.com/one.json,http://example.com,inexistent.json'
+      ].join("\r\n")
+
+      profile_url = 'http://example.com/one.json'
+      profile_body = '{ "title": "base_profile" }'
+
+      FakeWeb.register_uri(:get, profile_url, :body => profile_body)
+
+      tempfile = Tempfile.new('.csv')
+      tempfile.write(body)
+      tempfile.rewind
+
+      registry = DataPackage::Registry.new(tempfile.path)
+
+      base_profile = registry.get('base')
+      expect(base_profile).to_not eq(nil)
+      expect(base_profile['title']).to eq('base_profile')
     end
 
     context 'raises an error' do
 
       it 'if profile is not json' do
-        pending
+        registry_path = File.join('spec', 'fixtures', 'registry_with_notajson_profile.csv')
+        registry = DataPackage::Registry.new(registry_path)
+
+        expect { registry.get('notajson') }.to raise_error(DataPackage::RegistryError)
       end
 
       it 'remote profile file does not exist' do
-        pending
+        registry_url = 'http://example.com/registry.csv'
+        profile_url = 'http://example.com/one.json'
+
+        registry_body = [
+          'id,title,schema,specification,schema_path',
+          'base,Data Package,http://example.com/one.json,http://example.com,base.json'
+        ].join("\r\n")
+
+        FakeWeb.register_uri(:get, registry_url, :body => registry_body)
+        FakeWeb.register_uri(:get, profile_url, :body => "", :status => ["404", "Not Found"])
+
+        registry = DataPackage::Registry.new(registry_url)
+
+        expect { registry.get('base') }.to raise_error(DataPackage::RegistryError)
       end
 
       it 'local profile file does not exist' do
-        pending
+        body = [
+          'id,title,schema,specification,schema_path',
+          'base,Data Package,http://example.com/one.json,http://example.com,inexistent.json'
+        ].join("\r\n")
+
+        profile_url = 'http://example.com/one.json'
+        profile_body = '{ "title": "base_profile" }'
+
+        FakeWeb.register_uri(:get, profile_url, :body => "", :status => ["404", "Not Found"])
+
+        tempfile = Tempfile.new('.csv')
+        tempfile.write(body)
+        tempfile.rewind
+
+        registry = DataPackage::Registry.new(tempfile.path)
+
+        expect { registry.get('base') }.to raise_error(DataPackage::RegistryError)
       end
 
     end
 
     it 'returns nil if profile does not exist' do
-      pending
+      registry = DataPackage::Registry.new
+      expect(registry.get('non-existent-profile')).to be_nil
     end
 
     it 'memoizes the profiles' do
