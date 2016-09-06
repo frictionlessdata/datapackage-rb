@@ -277,7 +277,9 @@ describe DataPackage::Registry do
     end
 
     it 'cannot be set' do
-      skip
+      registry = DataPackage::Registry.new
+
+      expect { registry.base_path = "some/path" }.to raise_error(NoMethodError)
     end
 
   end
