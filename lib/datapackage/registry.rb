@@ -47,7 +47,7 @@ module DataPackage
         begin
           csv = parse_csv(registry_path_or_url)
           registry = {}
-          csv.each { |row| registry[row.fetch(:id)] = row.to_h }
+          csv.each { |row| registry[row.fetch(:id)] = Hash[row.headers.zip(row.fields)] }
         rescue KeyError, OpenURI::HTTPError, Errno::ENOENT
           raise(RegistryError)
         end
