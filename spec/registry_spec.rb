@@ -34,11 +34,7 @@ describe DataPackage::Registry do
     it 'has a default registry url' do
       default_url = 'http://schemas.datapackages.org/registry.csv'
 
-      FakeWeb.register_uri(:get, default_url, :body => @body)
-
-      registry = DataPackage::Registry.new()
-
-      expect(registry.available_profiles.values.count).to eq(1)
+      expect(DataPackage::Registry::DEFAULT_REGISTRY_URL).to eq(default_url)
     end
 
     it 'accepts a path' do
@@ -250,19 +246,25 @@ describe DataPackage::Registry do
   context 'base path' do
 
     it 'defaults to the local cache path' do
-      pending
+      registry = DataPackage::Registry.new
+
+      base_path = File.dirname(
+        File.absolute_path(DataPackage::Registry::DEFAULT_REGISTRY_PATH)
+      )
+
+      expect(registry.base_path).to eq(base_path)
     end
 
     it 'uses received registry base path' do
-      pending
+      skip
     end
 
     it 'is none if registry is remote' do
-      pending
+      skip
     end
 
     it 'cannot be set' do
-      pending
+      skip
     end
 
   end

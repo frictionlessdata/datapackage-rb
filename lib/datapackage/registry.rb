@@ -5,8 +5,11 @@ module DataPackage
   class Registry
 
     DEFAULT_REGISTRY_URL = 'http://schemas.datapackages.org/registry.csv'
+    DEFAULT_REGISTRY_PATH = File.join(File.expand_path(File.dirname(__FILE__)), '..', '..', 'datapackage', 'schemas', 'registry.csv')
 
-    def initialize(registry_path_or_url = DEFAULT_REGISTRY_URL)
+    attr_accessor :base_path
+
+    def initialize(registry_path_or_url = DEFAULT_REGISTRY_PATH)
       if File.file?(registry_path_or_url)
         @base_path = File.dirname(
           File.absolute_path(registry_path_or_url)
