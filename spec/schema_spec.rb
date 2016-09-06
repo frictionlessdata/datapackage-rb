@@ -75,9 +75,25 @@ describe DataPackage::Schema do
         }
       end
 
-      it 'when the url does not exist'
+      it 'when the url does not exist' do
+        url = 'http://bad.org/terrible.json'
 
-      it 'when the schema is not a string or hash'
+        FakeWeb.register_uri(:get, url, :body => "", :status => ["404", "Not Found"])
+
+        expect { DataPackage::Schema.new(url) }.to raise_exception { |exception|
+          expect(exception).to be_a DataPackage::SchemaException
+          expect(exception.message).to eq ("Schema URL returned 404 Not Found")
+        }
+      end
+
+      it 'when the schema is not a string, hash or symbol' do
+        a = [1, 2, 3]
+
+        expect { DataPackage::Schema.new(a) }.to raise_exception { |exception|
+          expect(exception).to be_a DataPackage::SchemaException
+          expect(exception.message).to eq ("Schema must be a URL, path, Hash or registry-identifier")
+        }
+      end
 
       it 'when the schema is invalid'
 

@@ -8,14 +8,19 @@ module DataPackage
         self.merge! schema
       elsif schema.class == Symbol
         self.merge! get_schema_from_registry schema
-      else
+      elsif schema.class == String
         self.merge! load_schema(schema)
+      else
+        raise SchemaException.new "Schema must be a URL, path, Hash or registry-identifier"
       end
     end
 
     def load_schema(path_or_url)
       json = open(path_or_url).read
       JSON.parse(json)
+
+    rescue OpenURI::HTTPError => e
+      raise SchemaException.new "Schema URL returned #{e.message}"
 
     rescue JSON::ParserError
       raise SchemaException.new 'Schema is not valid JSON'
