@@ -63,7 +63,17 @@ describe DataPackage::Schema do
         }
       end
 
-      it 'when the url is not json'
+      it 'when the url is not json' do
+        url = 'http://example.org/thing.json'
+        body = File.read File.join('spec', 'fixtures', 'not_a_json')
+
+        FakeWeb.register_uri(:get, url, :body => body)
+
+        expect { DataPackage::Schema.new(url) }.to raise_exception { |exception|
+          expect(exception).to be_a DataPackage::SchemaException
+          expect(exception.status).to eq ("Schema is not valid JSON")
+        }
+      end
 
       it 'when the url does not exist'
 
