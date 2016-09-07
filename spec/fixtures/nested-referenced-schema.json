@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Data Package",
+  "description": "Data Package is a simple specification for data access and delivery.",
+  "type": "object",
+  "required": [ "name" ],
+  "properties": {
+    "nested-for-some-reason": {
+      "name": {
+        "$ref": "nested-definitions.json#/define/name",
+        "propertyOrder": 10
+      }
+    }
+  }
+}

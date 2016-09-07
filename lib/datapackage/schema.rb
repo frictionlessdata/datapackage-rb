@@ -15,32 +15,50 @@ module DataPackage
       end
     end
 
-    def dereference_schema(path_or_url, schema)
-      if path_or_url =~ /\A#{URI::regexp}\z/
-        uri = URI.parse(path_or_url)
-        base_path = "#{uri.scheme}://#{uri.host}#{File.dirname uri.path}".chomp('/')
-      else
-        base_path = File.expand_path File.dirname path_or_url
-      end
+    def dereference_schema path_or_url, schema
+      @base_path = base_path path_or_url
+
       (schema['properties'] || {}).each_pair.map do |k,v|
         if v['$ref']
-          filename, reference = v.delete('$ref').split('#')
+          filename, reference = v['$ref'].split '#'
           # load the reference
-          definitions = JSON.parse(open(base_path + '/' + filename).read)
-          defs = definitions.dig *reference.split('/').reject(&:empty?)
+          defs = get_definitions(filename).dig *reference.split('/').reject(&:empty?)
           # replace the ref with the thing
-          v.merge!(defs)
+          v.delete '$ref'
+          v.merge! defs
         else
           v
         end
       end
+
       schema
+    end
+
+    def walk tree
+      if tree.class == Hash
+        return walk tree
+      else
+        return tree
+      end
+    end
+
+    def get_definitions filename
+      JSON.parse open("#{@base_path}/#{filename}").read
+    end
+
+    def base_path path_or_url
+      if path_or_url =~ /\A#{URI::regexp}\z/
+        uri = URI.parse path_or_url
+        return "#{uri.scheme}://#{uri.host}#{File.dirname uri.path}".chomp('/')
+      else
+        return File.expand_path File.dirname path_or_url
+      end
     end
 
     def load_schema(path_or_url)
       json = open(path_or_url).read
-      schema = JSON.parse(json)
-      dereference_schema(path_or_url, schema)
+      schema = JSON.parse json
+      dereference_schema path_or_url, schema
 
     rescue OpenURI::HTTPError => e
       raise SchemaException.new "Schema URL returned #{e.message}"

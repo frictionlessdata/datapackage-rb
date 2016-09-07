@@ -1,0 +1,9 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "define": {
+    "name": {
+      "title": "Nested name",
+      "type": "string"
+    }
+  }
+}
