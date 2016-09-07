@@ -33,5 +33,14 @@ module DataPackage
       d = DataPackage::Registry.new
       d.get schema.to_s
     end
+
+    def validate(package)
+      JSON::Validator.validate(package, self)
+    end
+
+    def valid?(package)
+      validate(package) === true
+    end
+
   end
 end

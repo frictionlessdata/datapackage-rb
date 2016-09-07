@@ -103,7 +103,14 @@ describe DataPackage::Schema do
 
   context 'validate' do
 
-    it 'validates correctly'
+    before(:each) do
+      @schema = DataPackage::Schema.new(:base)
+      @valid_datapackage = JSON.parse(File.read File.join('spec', 'test-pkg', 'valid-datapackage.json'))
+    end
+
+    it 'validates correctly' do
+      expect(@schema.valid?(@valid_datapackage)).to eq(true)
+    end
 
     it 'returns errors'
 
