@@ -1,5 +1,3 @@
-require 'spec_helper'
-
 describe DataPackage::Package do
 
     before(:each) do
@@ -12,6 +10,7 @@ describe DataPackage::Package do
       it "allows initialization without an object or string" do
         package = DataPackage::Package.new
       end
+      
     end
 
     context "when parsing packages" do
@@ -25,7 +24,7 @@ describe DataPackage::Package do
             expect( package.name ).to eql("test-package")
             expect( package.resources.length ).to eql(1)
         end
-        
+
         it "should support reading properties directly" do
             package = {
                 "name" => "test-package",
@@ -37,7 +36,7 @@ describe DataPackage::Package do
             expect( package.property("another-property") ).to eql(nil)
             expect( package.property("another-property", "default") ).to eql("default")
         end
-        
+
         it "should load from a local file" do
             package = DataPackage::Package.new( test_package_filename )
             expect( package.name ).to eql("test-package")
@@ -52,53 +51,53 @@ describe DataPackage::Package do
             expect( package.sources ).to eql([])
             expect( package.keywords ).to eql( [ "test", "testing" ] )
             expect( package.last_modified ).to eql( DateTime.parse("2013-12-05") )
-            expect( package.image ).to eql(nil)                        
-            expect( package.resources.length ).to eql(1)            
+            expect( package.image ).to eql(nil)
+            expect( package.resources.length ).to eql(1)
         end
-        
+
         it "should load from a directory" do
-            package = DataPackage::Package.new( File.join( File.dirname(__FILE__), "test-pkg"), 
+            package = DataPackage::Package.new( File.join( File.dirname(__FILE__), "test-pkg"),
                 {:default_filename=>"valid-datapackage.json"})
             expect( package.name ).to eql("test-package")
-            expect( package.resources.length ).to eql(1)                
+            expect( package.resources.length ).to eql(1)
         end
-        
+
         it "should load from am explicit URL" do
-            FakeWeb.register_uri(:get, "http://example.com/datapackage.json", 
+            FakeWeb.register_uri(:get, "http://example.com/datapackage.json",
                 :body => File.read( test_package_filename ) )
-            package = DataPackage::Package.new( "http://example.com/datapackage.json" )    
+            package = DataPackage::Package.new( "http://example.com/datapackage.json" )
             expect( package.name ).to eql("test-package")
-            expect( package.resources.length ).to eql(1)                            
+            expect( package.resources.length ).to eql(1)
         end
-        
-        it "should load from a base URL" do            
-            FakeWeb.register_uri(:get, "http://example.com/datapackage.json", 
+
+        it "should load from a base URL" do
+            FakeWeb.register_uri(:get, "http://example.com/datapackage.json",
                 :body => File.read( test_package_filename ) )
-            package = DataPackage::Package.new( "http://example.com/" )    
+            package = DataPackage::Package.new( "http://example.com/" )
             expect( package.name ).to eql("test-package")
-            expect( package.resources.length ).to eql(1)                            
+            expect( package.resources.length ).to eql(1)
         end
-        
+
         it "should distinguish between local and remote packages" do
             package = DataPackage::Package.new( { "name" => "test"} )
             expect( package.local? ).to eql(true)
             expect( package.base ).to eql("")
-            
+
             file = test_package_filename
             package = DataPackage::Package.new(file)
             expect( package.local? ).to eql(true)
             expect( package.base ).to eql( File.join( File.dirname(__FILE__),"test-pkg") )
-            
-            FakeWeb.register_uri(:get, "http://example.com/datapackage.json", 
+
+            FakeWeb.register_uri(:get, "http://example.com/datapackage.json",
                 :body => File.read( test_package_filename ) )
-            package = DataPackage::Package.new( "http://example.com/" )    
-            expect( package.local? ).to eql(false)            
+            package = DataPackage::Package.new( "http://example.com/" )
+            expect( package.local? ).to eql(false)
             expect( package.base ).to eql( "http://example.com" )
         end
-        
+
     end
-        
-    #We're just testing simple validation options here, there are separate 
+
+    #We're just testing simple validation options here, there are separate
     #specs for testing the validators and the individual schemas
     context "when validating with the datapackage profile" do
         it "should validate basic datapackage structure" do
@@ -106,14 +105,14 @@ describe DataPackage::Package do
             expect( package.valid? ).to be(true)
             expect( package.valid?(:datapackage, true) ).to be(true)
             messages = package.validate
-            expect( messages[:errors] ).to eql([])            
+            expect( messages[:errors] ).to eql([])
             expect( messages[:warnings] ).to eql([])
         end
-        
+
         it "should detect invalid datapackages" do
             package = DataPackage::Package.new( { "name" => "this is invalid" } )
-            expect( package.valid? ).to be(false)            
-        end                        
+            expect( package.valid? ).to be(false)
+        end
     end
-    
+
 end
