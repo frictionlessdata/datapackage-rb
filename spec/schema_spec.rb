@@ -42,6 +42,22 @@ describe DataPackage::Schema do
       expect(schema).to eq expected
     end
 
+    it 'loads a schema from a custom registry' do
+      registry_path = File.join('spec', 'fixtures', 'base_registry.csv')
+      schema_path = File.join('spec', 'fixtures', 'fake_schema.json')
+
+      registry_url = 'http://some-place.com/registry.csv'
+
+      FakeWeb.register_uri(:get, registry_url, :body => File.read(registry_path))
+      FakeWeb.register_uri(:get, 'http://example.com/one.json', :body => File.read(schema_path))
+
+      schema = DataPackage::Schema.new(:base, registry_url: registry_url)
+
+      expect(schema).to eq ({
+        'key' => 'value'
+      })
+    end
+
     context 'derefences a schema' do
 
       it 'with a file' do

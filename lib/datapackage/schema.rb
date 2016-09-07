@@ -3,7 +3,8 @@ module DataPackage
 
     attr_reader :schema
 
-    def initialize(schema)
+    def initialize(schema, options = {})
+      @registry_url = options[:registry_url]
       if schema.class == Hash
         self.merge! schema
       elsif schema.class == Symbol
@@ -57,8 +58,8 @@ module DataPackage
     end
 
     def get_schema_from_registry schema
-      d = DataPackage::Registry.new
-      dereference_schema(d.base_path, d.get(schema.to_s))
+      d = DataPackage::Registry.new(@registry_url)
+      dereference_schema (@registry_url || d.base_path), d.get(schema.to_s)
     end
 
     def validate(package)
