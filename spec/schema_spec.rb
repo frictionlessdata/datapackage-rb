@@ -42,6 +42,22 @@ describe DataPackage::Schema do
       expect(schema).to eq expected
     end
 
+    context 'derefences a schema' do
+
+      it 'with a file' do
+        path = File.join('spec', 'fixtures', 'referenced-schema.json')
+
+        schema = DataPackage::Schema.new(path)
+
+        expect(schema['properties']['name']).to eq({
+          "propertyOrder" => 10,
+          "title" => "Name",
+          "type" => "string"
+        })
+      end
+
+    end
+
     context 'raises an error' do
 
       it 'when the path does not exist' do

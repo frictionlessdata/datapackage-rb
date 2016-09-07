@@ -15,9 +15,27 @@ module DataPackage
       end
     end
 
+    def dereference_schema(path_or_url, schema)
+      base_path = File.expand_path File.dirname path_or_url
+      schema['properties'].each_pair.map do |k,v|
+        if v['$ref']
+          filename, reference = v.delete('$ref').split('#')
+          # load the reference
+          definitions = JSON.parse(File.read(base_path + '/' + filename))
+          defs = definitions.dig *reference.split('/').reject(&:empty?)
+          # replace the ref with the thing
+          v.merge!(defs)
+        else
+          v
+        end
+      end
+      schema
+    end
+
     def load_schema(path_or_url)
       json = open(path_or_url).read
-      JSON.parse(json)
+      schema = JSON.parse(json)
+      dereference_schema(path_or_url, schema)
 
     rescue OpenURI::HTTPError => e
       raise SchemaException.new "Schema URL returned #{e.message}"
