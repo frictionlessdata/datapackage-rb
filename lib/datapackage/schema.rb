@@ -35,7 +35,7 @@ module DataPackage
     end
 
     def validate(package)
-      JSON::Validator.validate(package, self)
+      JSON::Validator.validate(self, package)
     end
 
     def valid?(package)
