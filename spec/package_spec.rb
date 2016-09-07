@@ -1,12 +1,19 @@
 require 'spec_helper'
 
 describe DataPackage::Package do
-    
+
     before(:each) do
         FakeWeb.clean_registry
-        FakeWeb.allow_net_connect = false        
+        FakeWeb.allow_net_connect = false
     end
-    
+
+    context "creating a package" do
+
+      it "allows initialization without an object or string" do
+        package = DataPackage::Package.new
+      end
+    end
+
     context "when parsing packages" do
         it "should initialize from an object" do
             package = {
