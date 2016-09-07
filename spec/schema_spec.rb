@@ -92,6 +92,18 @@ describe DataPackage::Schema do
         })
       end
 
+      it 'from a registry' do
+        schema = DataPackage::Schema.new(:base)
+
+        expect(schema['properties']['name']).to eq({
+          "propertyOrder" => 10,
+          "title" => "Name",
+          "description" => "An identifier for this package. Lower case characters with '.', '_' and '-' are allowed.",
+          "type" => "string",
+          "pattern" => "^([a-z0-9._-])+$"
+        })
+      end
+
     end
 
     context 'raises an error' do

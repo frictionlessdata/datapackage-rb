@@ -20,7 +20,11 @@ module DataPackage
         uri = URI.parse(path_or_url)
         base_path = "#{uri.scheme}://#{uri.host}#{File.dirname uri.path}".chomp('/')
       else
-        base_path = File.expand_path File.dirname path_or_url
+        if File.directory?(path_or_url)
+          base_path = path_or_url
+        else
+          base_path = File.expand_path File.dirname path_or_url
+        end
       end
       (schema['properties'] || {}).each_pair.map do |k,v|
         if v['$ref']
@@ -54,7 +58,7 @@ module DataPackage
 
     def get_schema_from_registry schema
       d = DataPackage::Registry.new
-      d.get schema.to_s
+      dereference_schema(d.base_path, d.get(schema.to_s))
     end
 
     def validate(package)
