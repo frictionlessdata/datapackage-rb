@@ -56,6 +56,42 @@ describe DataPackage::Schema do
         })
       end
 
+      it 'with a url' do
+        url = 'http://example.org/thing.json'
+
+        schema = File.read File.join('spec', 'fixtures', 'referenced-schema.json')
+        definitions = File.read File.join('spec', 'fixtures', 'definitions.json')
+
+        FakeWeb.register_uri(:get, url, :body => schema)
+        FakeWeb.register_uri(:get, 'http://example.org/definitions.json', :body => definitions)
+
+        schema = DataPackage::Schema.new(url)
+
+        expect(schema['properties']['name']).to eq({
+          "propertyOrder" => 10,
+          "title" => "Name",
+          "type" => "string"
+        })
+      end
+
+      it 'with a url in a subdirectory' do
+        url = 'http://example.org/schema/thing.json'
+
+        schema = File.read File.join('spec', 'fixtures', 'referenced-schema.json')
+        definitions = File.read File.join('spec', 'fixtures', 'definitions.json')
+
+        FakeWeb.register_uri(:get, url, :body => schema)
+        FakeWeb.register_uri(:get, 'http://example.org/schema/definitions.json', :body => definitions)
+
+        schema = DataPackage::Schema.new(url)
+
+        expect(schema['properties']['name']).to eq({
+          "propertyOrder" => 10,
+          "title" => "Name",
+          "type" => "string"
+        })
+      end
+
     end
 
     context 'raises an error' do

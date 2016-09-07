@@ -16,12 +16,17 @@ module DataPackage
     end
 
     def dereference_schema(path_or_url, schema)
-      base_path = File.expand_path File.dirname path_or_url
-      schema['properties'].each_pair.map do |k,v|
+      if path_or_url =~ /\A#{URI::regexp}\z/
+        uri = URI.parse(path_or_url)
+        base_path = "#{uri.scheme}://#{uri.host}#{File.dirname uri.path}".chomp('/')
+      else
+        base_path = File.expand_path File.dirname path_or_url
+      end
+      (schema['properties'] || {}).each_pair.map do |k,v|
         if v['$ref']
           filename, reference = v.delete('$ref').split('#')
           # load the reference
-          definitions = JSON.parse(File.read(base_path + '/' + filename))
+          definitions = JSON.parse(open(base_path + '/' + filename).read)
           defs = definitions.dig *reference.split('/').reject(&:empty?)
           # replace the ref with the thing
           v.merge!(defs)
