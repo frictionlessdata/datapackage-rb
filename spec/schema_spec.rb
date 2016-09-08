@@ -94,7 +94,6 @@ describe DataPackage::Schema do
 
       context 'nested referencing' do
         specify 'from a file' do
-          pending 'Confused'
           path = File.join('spec', 'fixtures', 'nested-referenced-schema.json')
 
           schema = DataPackage::Schema.new(path)

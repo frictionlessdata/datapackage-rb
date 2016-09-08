@@ -15,17 +15,54 @@ module DataPackage
       end
     end
 
+# https://gist.github.com/vdw/f3c832df8ce271a036f2
+    def hash_to_slashed_path(hash, path = "")
+      return {} unless hash
+      hash.each_with_object({}) do |(k, v), ret|
+        key = path + k.to_s
+
+        if v.is_a? Hash
+          ret.merge! hash_to_slashed_path(v, key.to_s + "/")
+        else
+          ret[key] = v
+        end
+      end
+    end
+
     def dereference_schema path_or_url, schema
       @base_path = base_path path_or_url
 
-      (schema['properties'] || {}).each_pair.map do |k, v|
-        if v['$ref']
-          v.merge! resolve(v['$ref'])
-          v.delete '$ref'
-        else
-          v
+      paths = hash_to_slashed_path schema['properties']
+
+      ref_keys = paths.keys.find { |p| p =~ /\$ref/ }
+      if ref_keys
+        ref_keys = [ref_keys] unless ref_keys.is_a? Array
+
+        ref_keys.each do |key|
+          path = key.split('/')[0..-2]
+          replacement = resolve(schema['properties'].dig(*path, '$ref'))
+
+          until path.count == 1
+            schema['properties'] = schema['properties'][path.shift]
+          end
+          last_path = path.shift
+          schema['properties'][last_path].merge! replacement
+          schema['properties'][last_path].delete '$ref'
         end
       end
+      #schema['properties'] = walk schema['properties']
+
+    #  (schema['properties'] || {}).each_pair.map do |k, v|
+    #    if v['$ref']
+    #      v.merge! resolve(v['$ref'])
+    #      v.delete '$ref'
+    #    elsif v.is_a? Hash
+    #      require "pry" ; binding.pry
+    #      dereference_schema path_or_url, v
+    #    else
+    #      v
+    #    end
+    #  end
 
       schema
     end
@@ -36,10 +73,21 @@ module DataPackage
     end
 
     def walk tree
-      if tree.class == Hash
-        return walk tree
-      else
-        return tree
+      resolved = {}
+
+      tree.each_pair.map do |k, v|
+        if k == '$ref'
+          resolved = resolve(v)
+          puts "------------------------------------------------------"
+          puts "I resolved this: #{resolved}"
+          puts tree
+        #  tree.merge! resolved
+
+        end
+#tree.delete '$ref'
+        if v.is_a? Hash
+          walk v
+        end
       end
     end
 
