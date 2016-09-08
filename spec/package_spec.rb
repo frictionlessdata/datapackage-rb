@@ -61,6 +61,24 @@ describe DataPackage::Package do
             expect( package.property("another-property", "default") ).to eql("default")
         end
 
+        it "should allow properties to be changed" do
+          package = {
+              "name" => "test-package",
+              "description" => "description",
+              "my-property" => "value"
+          }
+          package = DataPackage::Package.new(package)
+          package.name = 'new-package'
+
+          expect(package.name).to eq('new-package')
+
+          expect(package.to_h).to eq({
+              "name" => "new-package",
+              "description" => "description",
+              "my-property" => "value"
+          })
+        end
+
         it "should load from a local file" do
             package = DataPackage::Package.new( test_package_filename )
             expect( package.name ).to eql("test-package")
