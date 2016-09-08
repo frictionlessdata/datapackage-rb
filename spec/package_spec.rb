@@ -18,6 +18,7 @@ describe DataPackage::Package do
         package.name = "My awesome datapackage"
 
         expect(package.name).to eq("My awesome datapackage")
+        expect(package.to_h).to eq({"name" => "My awesome datapackage"})
       end
 
       it "uses the base schema by default" do

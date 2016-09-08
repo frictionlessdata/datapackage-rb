@@ -97,6 +97,10 @@ module DataPackage
             end
         end
 
+        def to_h
+          @metadata
+        end
+
         private
 
           def define_properties!
