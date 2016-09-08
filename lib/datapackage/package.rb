@@ -87,16 +87,7 @@ module DataPackage
         end
 
         def resource_exists?(location)
-            if !location.to_s.start_with?("http")
-                return File.exists?( location )
-            else
-                begin
-                    status = RestClient.head( location ).code
-                    return status == 200
-                rescue => e
-                    return false
-                end
-            end
+          @dead_resources.include?(location)
         end
 
         def to_h
