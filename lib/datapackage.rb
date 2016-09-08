@@ -5,6 +5,7 @@ require 'csv'
 require 'json'
 require 'json-schema'
 require 'rest-client'
+require 'zip'
 
 require 'datapackage/version'
 require 'datapackage/exceptions'

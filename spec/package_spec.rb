@@ -96,6 +96,26 @@ describe DataPackage::Package do
             expect( package.resources.length ).to eql(1)
         end
 
+        it "should load from a zip file" do
+          path = File.join( File.dirname(__FILE__), "fixtures", "test-pkg.zip" )
+
+          package = DataPackage::Package.new( path )
+
+          expect( package.name ).to eql("test-package")
+          expect( package.title ).to eql("Test Package")
+          expect( package.description ).to eql("Description")
+          expect( package.homepage ).to eql("http://example.org")
+          expect( package.version ).to eql("0.0.1")
+          [:sources, :contributors].each do |key|
+              expect( package.send(key) ).to eql([])
+          end
+          expect( package.dataDependencies ).to eql({})
+          expect( package.sources ).to eql([])
+          expect( package.keywords ).to eql( [ "test", "testing" ] )
+          expect( package.image ).to eql(nil)
+          expect( package.resources.length ).to eql(1)
+        end
+
         it "should load from a directory" do
             package = DataPackage::Package.new( File.join( File.dirname(__FILE__), "test-pkg"), nil,
                 {:default_filename=>"valid-datapackage.json"})
@@ -103,10 +123,18 @@ describe DataPackage::Package do
             expect( package.resources.length ).to eql(1)
         end
 
-        it "should load from am explicit URL" do
+        it "should load from an explicit URL" do
             FakeWeb.register_uri(:get, "http://example.com/datapackage.json",
                 :body => File.read( test_package_filename ) )
             package = DataPackage::Package.new( "http://example.com/datapackage.json" )
+            expect( package.name ).to eql("test-package")
+            expect( package.resources.length ).to eql(1)
+        end
+
+        it "should load from a zipfile at an explicit URL" do
+            FakeWeb.register_uri(:get, "http://example.com/datapackage.zip",
+                :body => File.read( File.join( File.dirname(__FILE__), "fixtures", "test-pkg.zip" ) ) )
+            package = DataPackage::Package.new( "http://example.com/datapackage.zip" )
             expect( package.name ).to eql("test-package")
             expect( package.resources.length ).to eql(1)
         end
