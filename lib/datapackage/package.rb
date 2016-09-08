@@ -111,8 +111,12 @@ module DataPackage
           end
 
           def read_resources!
-            resources.each do |r|
-              r['data'] = resolve_resource(r)
+            begin
+              resources.each do |r|
+                r['data'] = resolve_resource(r)
+              end
+            rescue NameError
+              nil
             end
           end
 
