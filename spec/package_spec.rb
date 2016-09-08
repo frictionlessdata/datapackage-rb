@@ -12,6 +12,14 @@ describe DataPackage::Package do
         expect(package.name).to eq(nil)
       end
 
+      it "allows properties to be set" do
+        package = DataPackage::Package.new
+
+        package.name = "My awesome datapackage"
+
+        expect(package.name).to eq("My awesome datapackage")
+      end
+
       it "uses the base schema by default" do
         package = DataPackage::Package.new
 

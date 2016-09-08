@@ -101,7 +101,7 @@ module DataPackage
 
           def define_properties!
             (@schema["properties"] || {}).each do |k,v|
-              self.class.send(:attr_writer, k.to_sym)
+              define_singleton_method("#{k.to_sym}=", Proc.new { |p| set_property(k,p) } )
               define_singleton_method("#{k.to_sym}", Proc.new { property k, default_value(v) } )
             end
           end
@@ -117,6 +117,10 @@ module DataPackage
             else
               nil
             end
+          end
+
+          def set_property(key, value)
+            @metadata[key] = value
           end
 
     end
