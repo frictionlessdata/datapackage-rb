@@ -3,7 +3,8 @@ module DataPackage
 
     attr_reader :schema
 
-    def initialize(schema)
+    def initialize(schema, options = {})
+      @registry_url = options[:registry_url]
       if schema.class == Hash
         self.merge! schema
       elsif schema.class == Symbol
@@ -33,7 +34,6 @@ module DataPackage
       @base_path = base_path path_or_url
 
       paths = hash_to_slashed_path schema['properties']
-
       ref_keys = paths.keys.find { |p| p =~ /\$ref/ }
       if ref_keys
         ref_keys = [ref_keys] unless ref_keys.is_a? Array
@@ -45,24 +45,12 @@ module DataPackage
           until path.count == 1
             schema['properties'] = schema['properties'][path.shift]
           end
+          
           last_path = path.shift
           schema['properties'][last_path].merge! replacement
           schema['properties'][last_path].delete '$ref'
         end
       end
-      #schema['properties'] = walk schema['properties']
-
-    #  (schema['properties'] || {}).each_pair.map do |k, v|
-    #    if v['$ref']
-    #      v.merge! resolve(v['$ref'])
-    #      v.delete '$ref'
-    #    elsif v.is_a? Hash
-    #      require "pry" ; binding.pry
-    #      dereference_schema path_or_url, v
-    #    else
-    #      v
-    #    end
-    #  end
 
       schema
     end
@@ -70,25 +58,6 @@ module DataPackage
     def resolve reference
       filename, reference = reference.split '#'
       get_definitions(filename).dig *reference.split('/').reject(&:empty?)
-    end
-
-    def walk tree
-      resolved = {}
-
-      tree.each_pair.map do |k, v|
-        if k == '$ref'
-          resolved = resolve(v)
-          puts "------------------------------------------------------"
-          puts "I resolved this: #{resolved}"
-          puts tree
-        #  tree.merge! resolved
-
-        end
-#tree.delete '$ref'
-        if v.is_a? Hash
-          walk v
-        end
-      end
     end
 
     def get_definitions filename
@@ -100,7 +69,11 @@ module DataPackage
         uri = URI.parse path_or_url
         return "#{uri.scheme}://#{uri.host}#{File.dirname uri.path}".chomp('/')
       else
-        return File.expand_path File.dirname path_or_url
+        if File.directory?(path_or_url)
+          return path_or_url
+        else
+          return File.expand_path File.dirname path_or_url
+        end
       end
     end
 
@@ -120,8 +93,8 @@ module DataPackage
     end
 
     def get_schema_from_registry schema
-      d = DataPackage::Registry.new
-      d.get schema.to_s
+      d = DataPackage::Registry.new(@registry_url)
+      dereference_schema (@registry_url || d.base_path), d.get(schema.to_s)
     end
 
     def validate(package)

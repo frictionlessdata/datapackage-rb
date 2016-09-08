@@ -38,8 +38,23 @@ describe DataPackage::Schema do
     it 'loads a schema from the registry' do
       schema = DataPackage::Schema.new(:base)
 
-      expected = JSON.parse(File.read File.join File.dirname(__FILE__), '..', 'datapackage', 'schemas', 'data-package.json')
-      expect(schema).to eq expected
+      expect(schema['properties'].count).to eq 13
+    end
+
+    it 'loads a schema from a custom registry' do
+      registry_path = File.join('spec', 'fixtures', 'base_registry.csv')
+      schema_path = File.join('spec', 'fixtures', 'fake_schema.json')
+
+      registry_url = 'http://some-place.com/registry.csv'
+
+      FakeWeb.register_uri(:get, registry_url, :body => File.read(registry_path))
+      FakeWeb.register_uri(:get, 'http://example.com/one.json', :body => File.read(schema_path))
+
+      schema = DataPackage::Schema.new(:base, registry_url: registry_url)
+
+      expect(schema).to eq ({
+        'key' => 'value'
+      })
     end
 
     context 'derefences a schema' do
@@ -92,20 +107,31 @@ describe DataPackage::Schema do
         })
       end
 
-      context 'nested referencing' do
-        specify 'from a file' do
-          path = File.join('spec', 'fixtures', 'nested-referenced-schema.json')
+      it 'from a registry' do
+        schema = DataPackage::Schema.new(:base)
 
-          schema = DataPackage::Schema.new(path)
-
-          expect(schema['properties']['name']).to eq({
-            "propertyOrder" => 10,
-            "title" => "Nested name",
-            "type" => "string"
-          })
-        end
+        expect(schema['properties']['name']).to eq({
+          "propertyOrder" => 10,
+          "title" => "Name",
+          "description" => "An identifier for this package. Lower case characters with '.', '_' and '-' are allowed.",
+          "type" => "string",
+          "pattern" => "^([a-z0-9._-])+$"
+        })
       end
+    end
 
+    context 'nested referencing' do
+      specify 'from a file' do
+        path = File.join('spec', 'fixtures', 'nested-referenced-schema.json')
+
+        schema = DataPackage::Schema.new(path)
+
+        expect(schema['properties']['name']).to eq({
+          "propertyOrder" => 10,
+          "title" => "Nested name",
+          "type" => "string"
+        })
+      end
     end
 
     context 'raises an error' do
