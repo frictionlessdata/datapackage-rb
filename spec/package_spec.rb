@@ -9,8 +9,23 @@ describe DataPackage::Package do
 
       it "allows initialization without an object or string" do
         package = DataPackage::Package.new
+        expect(package.name).to eq(nil)
       end
-      
+
+      it "uses the base schema by default" do
+        package = DataPackage::Package.new
+
+        expect(package.instance_variable_get("@schema")['title']).to eq('Data Package')
+      end
+
+      it "allows a schema to be specified" do
+        schema = {'foo' => 'bar'}
+
+        package = DataPackage::Package.new(nil, schema: schema)
+
+        expect(package.instance_variable_get("@schema")).to eq(schema)
+      end
+
     end
 
     context "when parsing packages" do
@@ -44,13 +59,12 @@ describe DataPackage::Package do
             expect( package.description ).to eql("Description")
             expect( package.homepage ).to eql("http://example.org")
             expect( package.version ).to eql("0.0.1")
-            [:sources, :maintainers, :publisher, :contributors].each do |key|
+            [:sources, :contributors].each do |key|
                 expect( package.send(key) ).to eql([])
             end
-            expect( package.dependencies ).to eql(nil)
+            expect( package.dataDependencies ).to eql({})
             expect( package.sources ).to eql([])
             expect( package.keywords ).to eql( [ "test", "testing" ] )
-            expect( package.last_modified ).to eql( DateTime.parse("2013-12-05") )
             expect( package.image ).to eql(nil)
             expect( package.resources.length ).to eql(1)
         end
@@ -99,20 +113,20 @@ describe DataPackage::Package do
 
     #We're just testing simple validation options here, there are separate
     #specs for testing the validators and the individual schemas
-    context "when validating with the datapackage profile" do
-        it "should validate basic datapackage structure" do
-            package = DataPackage::Package.new(test_package_filename)
-            expect( package.valid? ).to be(true)
-            expect( package.valid?(:datapackage, true) ).to be(true)
-            messages = package.validate
-            expect( messages[:errors] ).to eql([])
-            expect( messages[:warnings] ).to eql([])
-        end
-
-        it "should detect invalid datapackages" do
-            package = DataPackage::Package.new( { "name" => "this is invalid" } )
-            expect( package.valid? ).to be(false)
-        end
-    end
+    # context "when validating with the datapackage profile" do
+    #     it "should validate basic datapackage structure" do
+    #         package = DataPackage::Package.new(test_package_filename)
+    #         expect( package.valid? ).to be(true)
+    #         expect( package.valid?(:datapackage, true) ).to be(true)
+    #         messages = package.validate
+    #         expect( messages[:errors] ).to eql([])
+    #         expect( messages[:warnings] ).to eql([])
+    #     end
+    #
+    #     it "should detect invalid datapackages" do
+    #         package = DataPackage::Package.new( { "name" => "this is invalid" } )
+    #         expect( package.valid? ).to be(false)
+    #     end
+    # end
 
 end

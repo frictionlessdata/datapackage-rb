@@ -100,7 +100,7 @@ module DataPackage
         private
 
           def define_properties!
-            @schema["properties"].each do |k,v|
+            (@schema["properties"] || {}).each do |k,v|
               self.class.send(:attr_writer, k.to_sym)
               define_singleton_method("#{k.to_sym}", Proc.new { property k, default_value(v) } )
             end
