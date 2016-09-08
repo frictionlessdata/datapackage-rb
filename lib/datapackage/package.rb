@@ -107,7 +107,16 @@ module DataPackage
           end
 
           def default_value(schema_data)
-            nil
+            case schema_data['type']
+            when 'string'
+              nil
+            when 'array'
+              []
+            when 'object'
+              {}
+            else
+              nil
+            end
           end
 
     end
