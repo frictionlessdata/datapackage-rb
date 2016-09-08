@@ -164,6 +164,32 @@ describe DataPackage::Package do
             expect( package.base ).to eql( "http://example.com" )
         end
 
+        it "should read a resource from a local file" do
+          package = DataPackage::Package.new( test_package_filename )
+
+          expect(package.resources[0]['data']).to eq(File.read(  File.join( File.dirname(__FILE__),"test-pkg", "test.csv") ))
+        end
+
+        it "should read a resource from a url" do
+          FakeWeb.register_uri(:get, "http://example.com/datapackage.json",
+              :body => File.read( test_package_filename ) )
+
+          FakeWeb.register_uri(:get, "http://example.com/test.csv",
+              :body => File.read( test_package_filename('test.csv') ) )
+
+          package = DataPackage::Package.new( "http://example.com/datapackage.json" )
+
+          expect(package.resources[0]['data']).to eq(File.read(  File.join( File.dirname(__FILE__),"test-pkg", "test.csv") ))
+        end
+
+        it "should read a resource from a zipfile" do
+          path = File.join( File.dirname(__FILE__), "fixtures", "test-pkg.zip" )
+
+          package = DataPackage::Package.new( path )
+
+          expect(package.resources[0]['data']).to eq(File.read(  File.join( File.dirname(__FILE__),"test-pkg", "test.csv") ))
+        end
+
     end
 
     #We're just testing simple validation options here, there are separate

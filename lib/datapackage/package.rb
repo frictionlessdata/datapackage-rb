@@ -18,6 +18,7 @@ module DataPackage
           @schema = DataPackage::Schema.new(schema || :base)
           @metadata = parse_package(package)
           define_properties!
+          read_resources!
         end
 
         def parse_package(package)
@@ -66,16 +67,17 @@ module DataPackage
         end
 
         def resolve_resource(resource)
-            return resource["url"] || resolve( resource["path"] )
+          return resource["url"] || resolve( resource["path"] )
         end
 
         def resolve(path)
-            if local?
-                return File.join( base , path) if base != ""
-                return path
-            else
-                return URI.join(base, path)
-            end
+          if local?
+              path = File.join( base , path) if base != ""
+              path = path
+          else
+              path = URI.join(base, path)
+          end
+          open(path).read
         end
 
         def resource_exists?(location)
@@ -105,6 +107,12 @@ module DataPackage
             (@schema["properties"] || {}).each do |k,v|
               define_singleton_method("#{k.to_sym}=", Proc.new { |p| set_property(k,p) } )
               define_singleton_method("#{k.to_sym}", Proc.new { property k, default_value(v) } )
+            end
+          end
+
+          def read_resources!
+            resources.each do |r|
+              r['data'] = resolve_resource(r)
             end
           end
 
@@ -158,10 +166,16 @@ module DataPackage
 
           def unzip_package(package)
             package = write_to_tempfile(package) if package.start_with?("http")
+            dir = Dir.mktmpdir
             Zip::File.open(package) do |zip_file|
+              # Extract all the files
+              zip_file.each { |entry| entry.extract("#{dir}/#{File.basename entry.name}") }
+              # Get and parse the datapackage metadata
               entry = zip_file.glob("*/#{opts[:default_filename] || "datapackage.json"}").first
               package = JSON.parse( entry.get_input_stream.read )
             end
+            # Set the base dir to the directory we unzipped to
+            @opts[:base] = dir
             package
           end
 
