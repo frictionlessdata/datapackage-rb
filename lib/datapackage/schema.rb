@@ -18,20 +18,21 @@ module DataPackage
     def dereference_schema path_or_url, schema
       @base_path = base_path path_or_url
 
-      (schema['properties'] || {}).each_pair.map do |k,v|
+      (schema['properties'] || {}).each_pair.map do |k, v|
         if v['$ref']
-          filename, reference = v['$ref'].split '#'
-          # load the reference
-          defs = get_definitions(filename).dig *reference.split('/').reject(&:empty?)
-          # replace the ref with the thing
+          v.merge! resolve(v['$ref'])
           v.delete '$ref'
-          v.merge! defs
         else
           v
         end
       end
 
       schema
+    end
+
+    def resolve reference
+      filename, reference = reference.split '#'
+      get_definitions(filename).dig *reference.split('/').reject(&:empty?)
     end
 
     def walk tree
