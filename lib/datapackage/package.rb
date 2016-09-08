@@ -17,6 +17,7 @@ module DataPackage
           @opts = opts
           @schema = DataPackage::Schema.new(schema || :base)
           @metadata = parse_package(package)
+          @dead_resources = []
           define_properties!
           read_resources!
         end
@@ -35,15 +36,15 @@ module DataPackage
         #Returns the directory for a local file package or base url for a remote
         #Returns nil for an in-memory object (because it has no base as yet)
         def base
-            #user can override base
-            return @opts[:base] if @opts[:base]
-            return "" unless @location
-            #work out base directory or uri
-            if local?
-                return File.dirname( @location )
-            else
-                return @location.split("/")[0..-2].join("/")
-            end
+          #user can override base
+          return @opts[:base] if @opts[:base]
+          return "" unless @location
+          #work out base directory or uri
+          if local?
+              return File.dirname( @location )
+          else
+              return @location.split("/")[0..-2].join("/")
+          end
         end
 
         #Is this a local package? Returns true if created from an in-memory object or a file/directory reference
@@ -72,12 +73,16 @@ module DataPackage
 
         def resolve(path)
           if local?
-              path = File.join( base , path) if base != ""
-              path = path
+            path = File.join( base , path) if base != ""
+            path = path
           else
-              path = URI.join(base, path)
+            path = URI.join(base, path)
           end
-          open(path).read
+          begin
+            open(path).read
+          rescue
+            @dead_resources << path
+          end
         end
 
         def resource_exists?(location)
