@@ -49,8 +49,9 @@ module DataPackage
 
         #Is this a local package? Returns true if created from an in-memory object or a file/directory reference
         def local?
-            return !@location.start_with?("http") if @location
-            return true
+          return @local if @local
+          return !@location.start_with?("http") if @location
+          return true
         end
 
         def property(property, default=nil)
@@ -185,6 +186,8 @@ module DataPackage
             end
             # Set the base dir to the directory we unzipped to
             @opts[:base] = dir
+            # This is now a local file, not a URL
+            @local = true
             package
           end
 

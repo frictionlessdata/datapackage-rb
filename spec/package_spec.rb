@@ -38,27 +38,28 @@ describe DataPackage::Package do
     end
 
     context "when parsing packages" do
-        it "should initialize from an object" do
-            package = {
-                "name" => "test-package",
-                "description" => "description",
-                "resources" => [ { "path" => "data.csv" }]
-            }
-            package = DataPackage::Package.new(package)
-            expect( package.name ).to eql("test-package")
-            expect( package.resources.length ).to eql(1)
-        end
+
+      it "should initialize from an object" do
+        package = {
+            "name" => "test-package",
+            "description" => "description",
+            "resources" => [ { "path" => "data.csv" }]
+        }
+        package = DataPackage::Package.new(package)
+        expect( package.name ).to eql("test-package")
+        expect( package.resources.length ).to eql(1)
+      end
 
         it "should support reading properties directly" do
-            package = {
-                "name" => "test-package",
-                "description" => "description",
-                "my-property" => "value"
-            }
-            package = DataPackage::Package.new(package)
-            expect( package.property("my-property") ).to eql("value")
-            expect( package.property("another-property") ).to eql(nil)
-            expect( package.property("another-property", "default") ).to eql("default")
+          package = {
+              "name" => "test-package",
+              "description" => "description",
+              "my-property" => "value"
+          }
+          package = DataPackage::Package.new(package)
+          expect( package.property("my-property") ).to eql("value")
+          expect( package.property("another-property") ).to eql(nil)
+          expect( package.property("another-property", "default") ).to eql("default")
         end
 
         it "should allow properties to be changed" do
