@@ -14,22 +14,26 @@ module DataPackage
         # opts:: Options used to customize reading and parsing
         def initialize(package = nil, opts={})
           @opts = opts
-          parse_package(package) unless package.nil?
+          @schema = DataPackage::Schema.new(opts[:schema] || :base)
+          @metadata = parse_package(package)
+          define_properties!
         end
 
         def parse_package(package)
           #TODO base directory/url
-          if package.class == Hash
-              @metadata = package
+          if package == nil
+            {}
+          elsif package.class == Hash
+            package
           else
-              if !package.start_with?("http") && File.directory?(package)
-                  package = File.join(package, opts[:default_filename] || "datapackage.json")
-              end
-              if package.start_with?("http") && !package.end_with?("datapackage.json")
-                  package = URI.join(package, "datapackage.json")
-              end
-              @location = package.to_s
-              @metadata = JSON.parse( open(package).read )
+            if !package.start_with?("http") && File.directory?(package)
+                package = File.join(package, opts[:default_filename] || "datapackage.json")
+            end
+            if package.start_with?("http") && !package.end_with?("datapackage.json")
+                package = URI.join(package, "datapackage.json")
+            end
+            @location = package.to_s
+            JSON.parse( open(package).read )
           end
         end
 
@@ -51,73 +55,6 @@ module DataPackage
         def local?
             return !@location.start_with?("http") if @location
             return true
-        end
-
-        def name
-            @metadata["name"]
-        end
-
-        def title
-            @metadata["title"]
-        end
-
-        def description
-            @metadata["description"]
-        end
-
-        def homepage
-            @metadata["homepage"]
-        end
-
-        def licenses
-            @metadata["licenses"] || []
-        end
-        alias_method :licences, :licenses
-
-        #What version of datapackage specification is this using?
-        def datapackage_version
-            @metadata["datapackage_version"]
-        end
-
-        #What is the version of this specific data package?
-        def version
-            @metadata["version"]
-        end
-
-        def sources
-            @metadata["sources"] || []
-        end
-
-        def keywords
-            @metadata["keywords"] || []
-        end
-
-        def last_modified
-            DateTime.parse @metadata["last_modified"] rescue nil
-        end
-
-        def image
-            @metadata["image"]
-        end
-
-        def maintainers
-            @metadata["maintainers"] || []
-        end
-
-        def contributors
-            @metadata["contributors"] || []
-        end
-
-        def publisher
-            @metadata["publisher"] || []
-        end
-
-        def resources
-            @metadata["resources"] || []
-        end
-
-        def dependencies
-            @metadata["dependencies"]
         end
 
         def property(property, default=nil)
@@ -159,6 +96,19 @@ module DataPackage
                 end
             end
         end
+
+        private
+
+          def define_properties!
+            @schema["properties"].each do |k,v|
+              self.class.send(:attr_writer, k.to_sym)
+              define_singleton_method("#{k.to_sym}", Proc.new { property k, default_value(v) } )
+            end
+          end
+
+          def default_value(schema_data)
+            nil
+          end
 
     end
 end
