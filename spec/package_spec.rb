@@ -30,7 +30,7 @@ describe DataPackage::Package do
       it "allows a schema to be specified" do
         schema = {'foo' => 'bar'}
 
-        package = DataPackage::Package.new(nil, schema: schema)
+        package = DataPackage::Package.new(nil, schema)
 
         expect(package.instance_variable_get("@schema")).to eq(schema)
       end
@@ -97,7 +97,7 @@ describe DataPackage::Package do
         end
 
         it "should load from a directory" do
-            package = DataPackage::Package.new( File.join( File.dirname(__FILE__), "test-pkg"),
+            package = DataPackage::Package.new( File.join( File.dirname(__FILE__), "test-pkg"), nil,
                 {:default_filename=>"valid-datapackage.json"})
             expect( package.name ).to eql("test-package")
             expect( package.resources.length ).to eql(1)

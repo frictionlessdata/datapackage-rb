@@ -11,10 +11,11 @@ module DataPackage
         # Supports reading data from JSON file, directory, and a URL
         #
         # package:: Hash or a String
+        # schema:: Hash, Symbol or String
         # opts:: Options used to customize reading and parsing
-        def initialize(package = nil, opts={})
+        def initialize(package = nil, schema = :base, opts={})
           @opts = opts
-          @schema = DataPackage::Schema.new(opts[:schema] || :base)
+          @schema = DataPackage::Schema.new(schema || :base)
           @metadata = parse_package(package)
           define_properties!
         end
@@ -99,6 +100,10 @@ module DataPackage
 
         def to_h
           @metadata
+        end
+
+        def to_json
+          @metadata.to_json
         end
 
         private
