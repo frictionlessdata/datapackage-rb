@@ -32,7 +32,6 @@ module DataPackage
 
     def dereference_schema path_or_url, schema
       @base_path = base_path path_or_url
-
       paths = hash_to_slashed_path schema['properties']
       ref_keys = paths.keys.find { |p| p =~ /\$ref/ }
       if ref_keys
@@ -42,13 +41,10 @@ module DataPackage
           path = key.split('/')[0..-2]
           replacement = resolve(schema['properties'].dig(*path, '$ref'))
 
-          until path.count == 1
-            schema['properties'] = schema['properties'][path.shift]
-          end
-          
-          last_path = path.shift
-          schema['properties'][last_path].merge! replacement
-          schema['properties'][last_path].delete '$ref'
+          s = "schema['properties']#{path.map { |k| "['#{k}']" }.join}.merge! replacement"
+          eval s
+          s = "schema['properties']#{path.map { |k| "['#{k}']" }.join}.delete '$ref'"
+          eval s
         end
       end
 
