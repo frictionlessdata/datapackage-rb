@@ -35,23 +35,11 @@ module DataPackage
             end
             @location = package.to_s
             if File.extname(package.to_s) == ".zip"
-              package = write_to_tempfile(package) if package.start_with?("http")
-              Zip::File.open(package) do |zip_file|
-                entry = zip_file.glob("*/#{opts[:default_filename] || "datapackage.json"}").first
-                package = JSON.parse( entry.get_input_stream.read )
-              end
-              package
+              unzip_package(package)
             else
               JSON.parse( open(package).read )
             end
           end
-        end
-
-        def write_to_tempfile(url)
-          tempfile = Tempfile.new
-          tempfile.write(open(url).read)
-          tempfile.rewind
-          tempfile
         end
 
         #Returns the directory for a local file package or base url for a remote
@@ -146,6 +134,22 @@ module DataPackage
 
           def set_property(key, value)
             @metadata[key] = value
+          end
+
+          def write_to_tempfile(url)
+            tempfile = Tempfile.new
+            tempfile.write(open(url).read)
+            tempfile.rewind
+            tempfile
+          end
+
+          def unzip_package(package)
+            package = write_to_tempfile(package) if package.start_with?("http")
+            Zip::File.open(package) do |zip_file|
+              entry = zip_file.glob("*/#{opts[:default_filename] || "datapackage.json"}").first
+              package = JSON.parse( entry.get_input_stream.read )
+            end
+            package
           end
 
     end
