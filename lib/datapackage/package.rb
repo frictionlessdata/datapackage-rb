@@ -27,18 +27,7 @@ module DataPackage
           elsif package.class == Hash
             package
           else
-            if !package.start_with?("http") && File.directory?(package)
-                package = File.join(package, opts[:default_filename] || "datapackage.json")
-            end
-            if package.start_with?("http") && !package.end_with?("datapackage.json", "datapackage.zip")
-                package = URI.join(package, "datapackage.json")
-            end
-            @location = package.to_s
-            if File.extname(package.to_s) == ".zip"
-              unzip_package(package)
-            else
-              JSON.parse( open(package).read )
-            end
+            read_package(package)
           end
         end
 
@@ -134,6 +123,30 @@ module DataPackage
 
           def set_property(key, value)
             @metadata[key] = value
+          end
+
+          def read_package(package)
+            if is_directory?(package)
+              package = File.join(package, opts[:default_filename] || "datapackage.json")
+            elsif is_containing_url?(package)
+              package = URI.join(package, "datapackage.json")
+            end
+
+            @location = package.to_s
+
+            if File.extname(package.to_s) == ".zip"
+              unzip_package(package)
+            else
+              JSON.parse open(package).read
+            end
+          end
+
+          def is_directory?(package)
+            !package.start_with?("http") && File.directory?(package)
+          end
+
+          def is_containing_url?(package)
+            package.start_with?("http") && !package.end_with?("datapackage.json", "datapackage.zip")
           end
 
           def write_to_tempfile(url)
