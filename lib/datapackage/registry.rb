@@ -10,6 +10,7 @@ module DataPackage
     attr_reader :base_path
 
     def initialize(registry_path_or_url = DEFAULT_REGISTRY_PATH)
+      registry_path_or_url ||= DEFAULT_REGISTRY_PATH
       if File.file?(registry_path_or_url)
         @base_path = File.dirname(
           File.absolute_path(registry_path_or_url)

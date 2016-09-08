@@ -8,6 +8,7 @@ require 'rest-client'
 
 require 'datapackage/version'
 require 'datapackage/exceptions'
+require 'datapackage/schema'
 require 'datapackage/validator'
 require 'datapackage/package'
 require 'datapackage/registry'
