@@ -40,6 +40,9 @@ module DataPackage
   end
 
   class InlineResource < Resource
+    def data
+      self['data']
+    end
   end
 
   class RemoteResource < Resource
