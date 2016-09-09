@@ -44,6 +44,15 @@ describe DataPackage::Resource do
       expect(DataPackage::Resource.load(resource)).to be_a_kind_of(DataPackage::LocalResource)
     end
 
+    it "returns a remote resource if local data doesn't exist" do
+      resource = {
+        'path' => test_package_filename('fake-file.csv'),
+        'url' => 'http://example.com/test.csv'
+      }
+
+      expect(DataPackage::Resource.load(resource)).to be_a_kind_of(DataPackage::RemoteResource)
+    end
+
     it "prefers inline data over a url" do
       resource = {
         'url' => 'http://example.com/test.csv',

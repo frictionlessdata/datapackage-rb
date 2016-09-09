@@ -6,7 +6,7 @@ module DataPackage
     end
 
     def self.load(resource, base_path = '', opts = {})
-      if local?(resource, opts)
+      if local?(resource, opts) && file_exists?(resource, base_path)
         if resource['data']
           InlineResource.new(resource)
         else
@@ -20,6 +20,16 @@ module DataPackage
     def self.local?(resource, opts)
       return opts[:local] if opts[:local]
       return resource['path'] != nil || resource['data'] != nil
+    end
+
+    def self.file_exists?(resource, base_path)
+      if resource['path']
+        path = resource['path']
+        path = File.join(base_path, path) if base_path != ''
+        File.exists?(path)
+      else
+        true
+      end
     end
 
   end
