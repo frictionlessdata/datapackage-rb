@@ -25,6 +25,18 @@ module DataPackage
   end
 
   class LocalResource < Resource
+
+    def initialize(resource, base_path = '')
+      @base_path = base_path
+      @path = resource['path']
+      super
+    end
+
+    def data
+      @path = File.join(@base_path, @path) if @base_path != ''
+      open(@path).read
+    end
+
   end
 
   class InlineResource < Resource
