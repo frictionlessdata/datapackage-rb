@@ -111,7 +111,7 @@ module DataPackage
       if resource.is_a?(Resource)
         resource
       else
-        Resource.load(resource, base, {local: local?})
+        Resource.load(resource, base)
       end
     end
 

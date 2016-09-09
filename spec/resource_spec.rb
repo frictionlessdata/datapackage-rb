@@ -62,14 +62,6 @@ describe DataPackage::Resource do
       expect(DataPackage::Resource.load(resource)).to be_a_kind_of(DataPackage::InlineResource)
     end
 
-    it "returns a local resource when forced to" do
-      resource = {
-        'url' => 'http://example.com/test.csv'
-      }
-
-      expect(DataPackage::Resource.load(resource, '', { local: true })).to be_a_kind_of(DataPackage::LocalResource)
-    end
-
   end
 
 end
