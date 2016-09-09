@@ -59,7 +59,7 @@ describe DataPackage::Schema do
 
     context 'derefences a schema' do
 
-      it 'with a file' do
+      specify 'with a file' do
         path = File.join('spec', 'fixtures', 'referenced-schema.json')
 
         schema = DataPackage::Schema.new(path)
@@ -71,7 +71,7 @@ describe DataPackage::Schema do
         })
       end
 
-      it 'with a url' do
+      specify 'with a url' do
         url = 'http://example.org/thing.json'
 
         schema = File.read File.join('spec', 'fixtures', 'referenced-schema.json')
@@ -89,7 +89,7 @@ describe DataPackage::Schema do
         })
       end
 
-      it 'with a url in a subdirectory' do
+      specify 'with a url in a subdirectory' do
         url = 'http://example.org/schema/thing.json'
 
         schema = File.read File.join('spec', 'fixtures', 'referenced-schema.json')
@@ -107,7 +107,7 @@ describe DataPackage::Schema do
         })
       end
 
-      it 'from a registry' do
+      specify 'from a registry' do
         schema = DataPackage::Schema.new(:base)
 
         expect(schema['properties']['name']).to eq({
@@ -126,11 +126,56 @@ describe DataPackage::Schema do
 
         schema = DataPackage::Schema.new(path)
 
-        expect(schema['properties']['name']).to eq({
+        expect(schema['properties']['nested-for-some-reason']['name']).to eq({
           "propertyOrder" => 10,
           "title" => "Nested name",
           "type" => "string"
         })
+
+        expect(schema).to eq ({
+          "$schema" => "http://json-schema.org/draft-04/schema#",
+          "description" => "Data Package is a simple specification for data access and delivery.",
+          "properties" => {
+            "nested-for-some-reason" => {
+              "name" => {
+                "propertyOrder" => 10,
+                "title" => "Nested name",
+                "type" => "string"
+              }
+            }
+          },
+          "required" => [
+            "name"
+          ],
+          "title" => "Data Package",
+          "type" => "object"
+        })
+      end
+
+      context 'references within references' do
+        specify 'turtles all the way down' do
+          path = File.join('spec', 'fixtures', 'nested-nested-schema.json')
+          schema = DataPackage::Schema.new(path)
+
+          expect(schema).to eq ({
+            "$schema" => "http://json-schema.org/draft-04/schema#",
+            "description" => "Data Package is a simple specification for data access and delivery.",
+            "properties" => {
+              "extra-nested-for-some-reason" => {
+                "name" => {
+                  "propertyOrder" => 10,
+                  "title" => "Nested thing",
+                  "type" => "string"
+                }
+              }
+            },
+            "required" => [
+              "name"
+            ],
+            "title" => "Data Package",
+            "type" => "object"
+          })
+        end
       end
     end
 

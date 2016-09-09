@@ -31,15 +31,15 @@ module DataPackage
     end
 
     def dereference_schema path_or_url, schema
-      @base_path = base_path path_or_url
-      paths = hash_to_slashed_path schema['properties']
+      paths = hash_to_slashed_path schema
       ref_keys = paths.keys.find { |p| p =~ /\$ref/ }
       if ref_keys
         ref_keys = [ref_keys] unless ref_keys.is_a? Array
 
         ref_keys.each do |key|
           path = key.split('/')[0..-2]
-          replacement = resolve(schema['properties'].dig(*path, '$ref'))
+
+          replacement = resolve(schema.dig(*path, '$ref'), path_or_url)
 
           s = "schema['properties']#{path.map { |k| "['#{k}']" }.join}.merge! replacement"
           eval s
@@ -51,13 +51,15 @@ module DataPackage
       schema
     end
 
-    def resolve reference
+    def resolve reference, path_or_url
+      base_path = base_path path_or_url
       filename, reference = reference.split '#'
-      get_definitions(filename).dig *reference.split('/').reject(&:empty?)
+      filename = path_or_url.split('/')[-1] if filename == ''
+      dereference_schema("#{base_path}/#{filename}", get_definitions(filename, base_path)).dig(*reference.split('/').reject(&:empty?))
     end
 
-    def get_definitions filename
-      JSON.parse open("#{@base_path}/#{filename}").read
+    def get_definitions filename, base_path
+      JSON.parse open("#{base_path}/#{filename}").read
     end
 
     def base_path path_or_url
@@ -65,6 +67,7 @@ module DataPackage
         uri = URI.parse path_or_url
         return "#{uri.scheme}://#{uri.host}#{File.dirname uri.path}".chomp('/')
       else
+
         if File.directory?(path_or_url)
           return path_or_url
         else
@@ -76,7 +79,7 @@ module DataPackage
     def load_schema(path_or_url)
       json = open(path_or_url).read
       schema = JSON.parse json
-      dereference_schema path_or_url, schema
+      s = dereference_schema path_or_url, schema
 
     rescue OpenURI::HTTPError => e
       raise SchemaException.new "Schema URL returned #{e.message}"
