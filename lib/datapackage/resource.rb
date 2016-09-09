@@ -46,5 +46,18 @@ module DataPackage
   end
 
   class RemoteResource < Resource
+
+    def initialize(resource, base_url = '')
+      @base_url = base_url
+      @url = resource['url']
+      @path = resource['path']
+      super
+    end
+
+    def data
+      url = @url ? @url : URI.join(@base_url, @path)
+      open(url).read
+    end
+
   end
 end
