@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.files                 = Dir['{bin,etc,lib}/**/*'] + ['LICENSE.md', 'README.md']
   s.executables           << 'datapackage'
   s.license               = 'MIT'
-  s.required_ruby_version = '> 2.0'
+  s.required_ruby_version = '>= 2.0'
 
   s.add_dependency 'json', '~> 1.8.3'
   s.add_dependency 'json-schema'
