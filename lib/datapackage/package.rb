@@ -1,7 +1,7 @@
 require 'open-uri'
 
 module DataPackage
-  class Package
+  class Package < Hash
     attr_reader :metadata, :opts
 
     # Parse or create a data package
@@ -14,8 +14,9 @@ module DataPackage
     def initialize(package = nil, schema = :base, opts = {})
       @opts = opts
       @schema = DataPackage::Schema.new(schema || :base)
-      @metadata = parse_package(package)
       @dead_resources = []
+
+      self.merge! parse_package(package)
       define_properties!
       read_resources!
     end
@@ -23,11 +24,11 @@ module DataPackage
     def parse_package(package)
       # TODO: base directory/url
       if package.nil?
-          {}
+        {}
       elsif package.class == Hash
-          package
+        package
       else
-          read_package(package)
+        read_package(package)
       end
     end
 
@@ -53,7 +54,7 @@ module DataPackage
     end
 
     def property(property, default = nil)
-      @metadata[property] || default
+      self[property] || default
     end
 
     def valid?(profile = :datapackage, strict = false)
@@ -88,12 +89,8 @@ module DataPackage
       @dead_resources.include?(location)
     end
 
-    def to_h
-      @metadata
-    end
-
     def to_json
-      @metadata.to_json
+      self.to_json
     end
 
     private
@@ -125,7 +122,7 @@ module DataPackage
     end
 
     def set_property(key, value)
-      @metadata[key] = value
+      self[key] = value
     end
 
     def read_package(package)
