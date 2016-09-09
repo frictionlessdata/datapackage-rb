@@ -168,7 +168,7 @@ describe DataPackage::Package do
         it "should read a resource from a local file" do
           package = DataPackage::Package.new( test_package_filename )
 
-          expect(package.resources[0]['data']).to eq(File.read(  File.join( File.dirname(__FILE__),"test-pkg", "test.csv") ))
+          expect(package.resources[0].data).to eq(File.read(  File.join( File.dirname(__FILE__),"test-pkg", "test.csv") ))
         end
 
         it "should read a resource from a url" do
@@ -180,7 +180,7 @@ describe DataPackage::Package do
 
           package = DataPackage::Package.new( "http://example.com/datapackage.json" )
 
-          expect(package.resources[0]['data']).to eq(File.read(  File.join( File.dirname(__FILE__),"test-pkg", "test.csv") ))
+          expect(package.resources[0].data).to eq(File.read(  File.join( File.dirname(__FILE__),"test-pkg", "test.csv") ))
         end
 
         it "should read a resource from a zipfile" do
@@ -188,7 +188,7 @@ describe DataPackage::Package do
 
           package = DataPackage::Package.new( path )
 
-          expect(package.resources[0]['data']).to eq(File.read(  File.join( File.dirname(__FILE__),"test-pkg", "test.csv") ))
+          expect(package.resources[0].data).to eq(File.read(  File.join( File.dirname(__FILE__),"test-pkg", "test.csv") ))
         end
 
     end

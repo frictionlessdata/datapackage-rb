@@ -67,24 +67,6 @@ module DataPackage
       validator.validate(self)
     end
 
-    def resolve_resource(resource)
-      resource['url'] || resolve(resource['path'])
-    end
-
-    def resolve(path)
-      if local?
-        path = File.join(base, path) if base != ''
-        path = path
-      else
-        path = URI.join(base, path)
-      end
-      begin
-        open(path).read
-      rescue
-        @dead_resources << path
-      end
-    end
-
     def resource_exists?(location)
       @dead_resources.include?(location)
     end
@@ -103,9 +85,14 @@ module DataPackage
     end
 
     def read_resources!
-      resources.each do |r|
-          r['data'] = resolve_resource(r)
+    resources.map! do |resource|
+      begin
+        Resource.load(resource, base, {local: local?})
+      rescue
+        @dead_resources << path
+        nil
       end
+    end
     rescue NameError
       nil
     end
