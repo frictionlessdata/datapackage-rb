@@ -35,6 +35,53 @@ describe DataPackage::Package do
         expect(package.instance_variable_get("@schema")).to eq(schema)
       end
 
+      context "allows a resource to be specified" do
+
+        it "with a file" do
+          file = test_package_filename('test.csv')
+
+          package = DataPackage::Package.new
+
+          package.resources << {
+            'path' => file
+          }
+
+          expect(package.resources[0]).to be_a_kind_of(DataPackage::LocalResource)
+          expect(package.resources[0].data).to eq(File.read(file))
+        end
+
+        it "with a url" do
+          file = test_package_filename('test.csv')
+          url = 'http://example.com/test.csv'
+
+          FakeWeb.register_uri(:get, url, :body => File.read( file ) )
+
+          package = DataPackage::Package.new
+
+          package.resources << {
+            'url' => url
+          }
+
+          expect(package.resources[0]).to be_a_kind_of(DataPackage::RemoteResource)
+          expect(package.resources[0].data).to eq(File.read(file))
+        end
+
+        it "with inline data" do
+          package = DataPackage::Package.new
+          data = [
+            ['foo', 'bar', 'baz']
+          ]
+
+          package.resources << {
+            'data' => data
+          }
+
+          expect(package.resources[0]).to be_a_kind_of(DataPackage::InlineResource)
+          expect(package.resources[0].data).to eq(data)
+        end
+
+      end
+
     end
 
     context "when parsing packages" do
@@ -43,7 +90,7 @@ describe DataPackage::Package do
         package = {
             "name" => "test-package",
             "description" => "description",
-            "resources" => [ { "path" => "data.csv" }]
+            "resources" => [ { "path" => test_package_filename('test.csv') }]
         }
         package = DataPackage::Package.new(package)
         expect( package.name ).to eql("test-package")

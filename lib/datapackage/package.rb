@@ -2,7 +2,8 @@ require 'open-uri'
 
 module DataPackage
   class Package < Hash
-    attr_reader :metadata, :opts
+    attr_reader :opts
+    attr_writer :resources
 
     # Parse or create a data package
     #
@@ -18,7 +19,7 @@ module DataPackage
 
       self.merge! parse_package(package)
       define_properties!
-      read_resources!
+      load_resources!
     end
 
     def parse_package(package)
@@ -53,6 +54,11 @@ module DataPackage
       true
     end
 
+    def resources
+      update_resources!
+      @resources
+    end
+
     def property(property, default = nil)
       self[property] || default
     end
@@ -79,22 +85,34 @@ module DataPackage
 
     def define_properties!
       (@schema['properties'] || {}).each do |k, v|
-          define_singleton_method("#{k.to_sym}=", proc { |p| set_property(k, p) })
-          define_singleton_method(k.to_sym.to_s, proc { property k, default_value(v) })
+        next if k == 'resources'
+        define_singleton_method("#{k.to_sym}=", proc { |p| set_property(k, p) })
+        define_singleton_method(k.to_sym.to_s, proc { property k, default_value(v) })
       end
     end
 
-    def read_resources!
-    resources.map! do |resource|
-      begin
-        Resource.load(resource, base, {local: local?})
-      rescue
-        @dead_resources << path
-        nil
+    def load_resources!
+      @resources = (self['resources'] || [])
+      update_resources!
+    end
+
+    def update_resources!
+      @resources.map! do |resource|
+        begin
+          load_resource(resource)
+        rescue
+          @dead_resources << resource['path']
+          nil
+        end
       end
     end
-    rescue NameError
-      nil
+
+    def load_resource(resource)
+      if resource.is_a?(Resource)
+        resource
+      else
+        Resource.load(resource, base, {local: local?})
+      end
     end
 
     def default_value(schema_data)
