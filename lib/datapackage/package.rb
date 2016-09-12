@@ -155,7 +155,7 @@ module DataPackage
     end
 
     def write_to_tempfile(url)
-      tempfile = Tempfile.new
+      tempfile = Tempfile.new('datapackage')
       tempfile.write(open(url).read)
       tempfile.rewind
       tempfile
