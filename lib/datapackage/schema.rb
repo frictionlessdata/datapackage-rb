@@ -39,7 +39,7 @@ module DataPackage
         ref_keys.each do |key|
           path = key.split('/')[0..-2]
 
-          replacement = resolve(schema.dig(*path, '$ref'), path_or_url)
+          replacement = resolve(schema.dig(*path, '$ref'), path_or_url, schema)
 
           s = "schema['properties']#{path.map { |k| "['#{k}']" }.join}.merge! replacement"
           eval s
@@ -51,7 +51,7 @@ module DataPackage
       schema
     end
 
-    def resolve reference, path_or_url
+    def resolve reference, path_or_url, schema
       base_path = base_path path_or_url
       filename, reference = reference.split '#'
       filename = path_or_url.split('/')[-1] if filename == ''
