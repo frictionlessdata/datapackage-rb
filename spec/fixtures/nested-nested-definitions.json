@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "define": {
+    "name": {
+      "title": "Nested name",
+      "type": "string"
+    },
+    "nestedThing": {
+      "title": "Nested thing",
+      "type": "string"
+    },
+    "thingOverThere": {
+      "$ref": "#/define/nestedThing"
+    }
+  }
+}
