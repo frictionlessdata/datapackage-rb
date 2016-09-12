@@ -246,7 +246,6 @@ describe DataPackage::Schema do
     end
 
     it 'validates correctly' do
-      pending "Baffling"
       expect(@schema.valid?(@valid_datapackage)).to eq(true)
     end
 
