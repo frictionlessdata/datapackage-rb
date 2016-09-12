@@ -32,7 +32,7 @@ module DataPackage
 
     def dereference_schema path_or_url, schema
       paths = hash_to_slashed_path schema
-      ref_keys = paths.keys.find { |p| p =~ /\$ref/ }
+      ref_keys = paths.keys.select { |p| p =~ /\$ref/ }
       if ref_keys
         ref_keys = [ref_keys] unless ref_keys.is_a? Array
 
