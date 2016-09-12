@@ -1,10 +1,5 @@
 describe DataPackage::Package do
 
-    before(:each) do
-        FakeWeb.clean_registry
-        FakeWeb.allow_net_connect = false
-    end
-
     context "creating a package" do
 
       it "allows initialization without an object or string" do
