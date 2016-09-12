@@ -99,12 +99,12 @@ module DataPackage
       dereference_schema (@registry_url || d.base_path), d.get(schema.to_s)
     end
 
-    def validate(package)
+    def valid?(package)
       JSON::Validator.validate(self, package)
     end
 
-    def valid?(package)
-      validate(package) === true
+    def validation_errors(package)
+      JSON::Validator.fully_validate(self, package)
     end
 
   end

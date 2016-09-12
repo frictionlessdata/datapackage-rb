@@ -243,65 +243,28 @@ describe DataPackage::Schema do
     before(:each) do
       @schema = DataPackage::Schema.new(:base)
       @valid_datapackage = JSON.parse(File.read File.join('spec', 'test-pkg', 'valid-datapackage.json'))
+      @invalid_datapackage = JSON.parse(File.read File.join('spec', 'fixtures', 'invalid-datapackage.json'))
     end
 
     it 'validates correctly' do
       expect(@schema.valid?(@valid_datapackage)).to eq(true)
     end
 
-    it 'returns errors'
+    it 'returns errors' do
+      expect(@schema.valid?(@invalid_datapackage)).to eq(false)
 
-    it 'returns multiple errors'
-    # test_iter_validation_returns_iter_with_each_validationerror
+      errors = @schema.validation_errors(@invalid_datapackage)
+      expect(errors.count).to eq(2)
+      expect(errors).to eq([
+        "The property '#/' did not contain a required property of 'name' in schema ccfffe25-174d-53ba-aa73-f63a5565bdb9#",
+        "The property '#/resources/0/name' value \"Test Data\" did not match the regex '^([a-z0-9._-])+$' in schema ccfffe25-174d-53ba-aa73-f63a5565bdb9#"
+      ])
+    end
 
-    it 'retuns no errors if data is valid'
+    it 'retuns no errors if data is valid' do
+      expect(@schema.validation_errors(@valid_datapackage).count).to eq(0)
+    end
 
   end
 
-  it 'creates attributes for every toplevel attribute'
-
-  it 'does not allow changing schema properties'
-
-  it 'allows changing properties not in schema'
-
-  it ' does not change the originals when changing properties'
-
 end
-
-#
-# def test_to_dict_converts_schema_to_dict(self):
-#     original_schema_dict = {
-#         'foo': 'bar',
-#     }
-#     schema = Schema(original_schema_dict)
-#     assert schema.to_dict() == original_schema_dict
-#
-# def test_to_dict_modifying_the_dict_doesnt_modify_the_schema(self):
-#     original_schema_dict = {
-#         'foo': 'bar',
-#     }
-#     schema = Schema(original_schema_dict)
-#     schema_dict = schema.to_dict()
-#     schema_dict['bar'] = 'baz'
-#     assert 'bar' not in schema.to_dict()
-# def test_properties_are_visible_with_dir(self):
-#     schema_dict = {
-#         'foo': {}
-#     }
-#     schema = Schema(schema_dict)
-#     assert 'foo' in dir(schema)
-#
-#
-# def test_schema_properties_doesnt_linger_in_class(self):
-#     foo_schema_dict = {
-#         'foo': {}
-#     }
-#     bar_schema_dict = {
-#         'bar': {}
-#     }
-#     foo_schema = Schema(foo_schema_dict)
-#     bar_schema = Schema(bar_schema_dict)
-#
-#     assert 'bar' not in dir(foo_schema)
-#     assert 'foo' not in dir(bar_schema)
-#
