@@ -27,7 +27,7 @@ describe DataPackage::LocalResource do
       'path' => 'test.csv'
     }
 
-    base_path = File.join( File.dirname(__FILE__), "test-pkg" )
+    base_path = File.join( File.dirname(__FILE__), "fixtures", "test-pkg" )
 
     resource = DataPackage::LocalResource.new(resource_hash, base_path)
     expect(resource.data).to eq(File.read(test_package_filename('test.csv')))

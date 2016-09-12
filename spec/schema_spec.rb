@@ -242,7 +242,7 @@ describe DataPackage::Schema do
 
     before(:each) do
       @schema = DataPackage::Schema.new(:base)
-      @valid_datapackage = JSON.parse(File.read File.join('spec', 'test-pkg', 'valid-datapackage.json'))
+      @valid_datapackage = JSON.parse(File.read File.join('spec', 'fixtures', 'test-pkg', 'valid-datapackage.json'))
       @invalid_datapackage = JSON.parse(File.read File.join('spec', 'fixtures', 'invalid-datapackage.json'))
     end
 

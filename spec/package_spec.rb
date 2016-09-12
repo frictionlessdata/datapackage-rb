@@ -160,7 +160,7 @@ describe DataPackage::Package do
       end
 
       it "should load from a directory" do
-          package = DataPackage::Package.new( File.join( File.dirname(__FILE__), "test-pkg"), nil,
+          package = DataPackage::Package.new( File.join( File.dirname(__FILE__), "fixtures", "test-pkg"), nil,
               {:default_filename=>"valid-datapackage.json"})
           expect( package.name ).to eql("test-package")
           expect( package.resources.length ).to eql(1)
@@ -198,7 +198,7 @@ describe DataPackage::Package do
           file = test_package_filename
           package = DataPackage::Package.new(file)
           expect( package.local? ).to eql(true)
-          expect( package.base ).to eql( File.join( File.dirname(__FILE__),"test-pkg") )
+          expect( package.base ).to eql( File.join( File.dirname(__FILE__), "fixtures", "test-pkg") )
 
           FakeWeb.register_uri(:get, "http://example.com/datapackage.json",
               :body => File.read( test_package_filename ) )
@@ -212,7 +212,7 @@ describe DataPackage::Package do
         it "from a local file" do
           package = DataPackage::Package.new( test_package_filename )
 
-          expect(package.resources[0].data).to eq(File.read(  File.join( File.dirname(__FILE__),"test-pkg", "test.csv") ))
+          expect(package.resources[0].data).to eq(File.read(  File.join( File.dirname(__FILE__), "fixtures", "test-pkg", "test.csv") ))
         end
 
         it "from a local file with a relative path" do
@@ -232,7 +232,7 @@ describe DataPackage::Package do
 
           package = DataPackage::Package.new( "http://example.com/datapackage.json" )
 
-          expect(package.resources[0].data).to eq(File.read(  File.join( File.dirname(__FILE__),"test-pkg", "test.csv") ))
+          expect(package.resources[0].data).to eq(File.read(  File.join( File.dirname(__FILE__), "fixtures", "test-pkg", "test.csv") ))
         end
 
         it "from a zipfile" do
@@ -240,7 +240,7 @@ describe DataPackage::Package do
 
           package = DataPackage::Package.new( path )
 
-          expect(package.resources[0].data).to eq(File.read(  File.join( File.dirname(__FILE__),"test-pkg", "test.csv") ))
+          expect(package.resources[0].data).to eq(File.read(  File.join( File.dirname(__FILE__), "fixtures", "test-pkg", "test.csv") ))
         end
 
       end
