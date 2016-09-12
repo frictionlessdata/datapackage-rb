@@ -88,6 +88,17 @@ end
 # {"name": "my_sleep_duration", "resources": [{"name": "data", "data": [7, 8, 5, 6, 9, 7, 8]}]}
 ```
 
+## Validating a Data Package
+
+```ruby
+package = DataPackage::Package.new('http://data.okfn.org/data/core/gdp/datapackage.json')
+
+package.valid?
+#=> true
+package.errors
+#=> [] # An array of errors
+```
+
 ## Using a different schema
 
 By default, the gem uses the standard [Data Package Schema](http://specs.frictionlessdata.io/data-packages/), but alternative schemas are available.
