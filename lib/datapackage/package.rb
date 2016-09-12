@@ -2,7 +2,7 @@ require 'open-uri'
 
 module DataPackage
   class Package < Hash
-    attr_reader :opts
+    attr_reader :opts, :errors
     attr_writer :resources
 
     # Parse or create a data package
@@ -63,14 +63,14 @@ module DataPackage
       self[property] || default
     end
 
-    def valid?(profile = :datapackage, strict = false)
-      validator = DataPackage::Validator.create(profile, @opts)
-      validator.valid?(self, strict)
+    def valid?
+      validate
+      @valid
     end
 
-    def validate(profile = :datapackage)
-      validator = DataPackage::Validator.create(profile, @opts)
-      validator.validate(self)
+    def validate
+      @errors = @schema.validation_errors(self)
+      @valid = @schema.valid?(self)
     end
 
     def resource_exists?(location)
