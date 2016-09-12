@@ -273,6 +273,21 @@ describe DataPackage::Package do
         expect( package.valid? ).to be(false)
       end
 
+      it "should validate on the fly" do
+        schema = {
+            'properties' => {
+                'name' => {}
+            },
+            'required' => ['name']
+        }
+
+        package = DataPackage::Package.new({}, schema)
+        expect(package.valid?).to eq(false)
+
+        package.name = 'A name'
+        expect(package.valid?).to eq(true)
+      end
+
     end
 
 end
