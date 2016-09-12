@@ -17,5 +17,4 @@ env:
   global:
     secure: YfFmjrohBO4Gbw7oqBVyy9f5jIu01cRLgMUFnyX2ju4RoW75CKetxGG6AqSolbYf+yjO4MO65L2quX/IkqVPFmKLQAVfm6atAaEFir6yC7KmQu792bNPOZ2pfY5NbKP/uq0mLU6tsPPV3TAajm7E9hcBMFIV7PJHuP3UJ6LVlUQ=
 after_success:
-  - gem install henry
-  - henry deploy
+  - bundle exec henry deploy
