@@ -6,6 +6,7 @@ require 'json'
 require 'json-schema'
 require 'rest-client'
 require 'zip'
+require 'ruby_dig'
 
 require 'datapackage/version'
 require 'datapackage/exceptions'

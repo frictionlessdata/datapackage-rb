@@ -1,5 +1,4 @@
 {
-    "name": "test-package",
     "title": "Test Package",
     "description": "Description",
     "homepage": "http://example.org",
@@ -14,7 +13,7 @@
     "keywords": [ "test", "testing" ],
     "resources": [
     {
-        "name": "test-data",
+        "name": "Test Data",
         "path": "test.csv",
         "format": "csv",
         "mediatype": "text/csv",
