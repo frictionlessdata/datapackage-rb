@@ -3,7 +3,7 @@ Coveralls.wear!
 
 require 'fakeweb'
 
-FakeWeb.allow_net_connect = %r[^https?://coveralls.io]
+FakeWeb.allow_net_connect = %r[^https?:\/\/coveralls.io.+$]
 
 require 'datapackage'
 
