@@ -41,9 +41,9 @@ module DataPackage
 
           replacement = resolve(schema.dig(*path, '$ref'), path_or_url, schema)
 
-          s = "schema['properties']#{path.map { |k| "['#{k}']" }.join}.merge! replacement"
+          s = "schema#{path.map { |k| "['#{k}']" }.join}.merge! replacement"
           eval s
-          s = "schema['properties']#{path.map { |k| "['#{k}']" }.join}.delete '$ref'"
+          s = "schema#{path.map { |k| "['#{k}']" }.join}.delete '$ref'"
           eval s
         end
       end
