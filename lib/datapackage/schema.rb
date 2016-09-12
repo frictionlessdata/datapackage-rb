@@ -54,8 +54,11 @@ module DataPackage
     def resolve reference, path_or_url, schema
       base_path = base_path path_or_url
       filename, reference = reference.split '#'
-      filename = path_or_url.split('/')[-1] if filename == ''
-      dereference_schema("#{base_path}/#{filename}", get_definitions(filename, base_path)).dig(*reference.split('/').reject(&:empty?))
+      if filename == ''
+        schema['define'][reference.split('/').last]
+      else
+        dereference_schema("#{base_path}/#{filename}", get_definitions(filename, base_path)).dig(*reference.split('/').reject(&:empty?))
+      end
     end
 
     def get_definitions filename, base_path
