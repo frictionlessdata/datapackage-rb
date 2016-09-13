@@ -33,7 +33,7 @@ gem install datapackage
 Require the gem, if you need to:
 
 ```ruby
-require 'datapackage.rb'
+require 'datapackage'
 ```
 
 Parsing a Data Package from a remote location:
@@ -64,6 +64,32 @@ package.title
 package.description
 package.homepage
 package.license
+```
+
+## Reading a Data Package and its resources
+
+```ruby
+require 'datapackage'
+
+dp = DataPackage::Package.new('http://data.okfn.org/data/core/gdp/datapackage.json')
+
+data = CSV.parse(dp.resources[0].data, headers: true)
+brazil_gdp = data.select { |r| r["Country Code"] == "BRA" }.
+                  map { |row| { year: Integer(row["Year"]), value: Float(row['Value']) } }
+
+max_gdp = brazil_gdp.max_by { |r| r[:value] }
+min_gdp = brazil_gdp.min_by { |r| r[:value] }
+
+percentual_increase = (max_gdp[:value] / min_gdp[:value]).round(2)
+max_gdp_val = max_gdp[:value].to_s.reverse.gsub(/(\d{3})(?=\d)/, '\\1,').reverse
+
+msg =  "The highest Brazilian GDP occured in #{max_gdp[:year]}, when it peaked at US$ " +
+"#{max_gdp_val}. This was #{percentual_increase}% more than its minumum GDP " +
+"in #{min_gdp[:year]}"
+
+print msg
+
+# The highest Brazilian GDP occured in 2011, when it peaked at US$ 2,615,189,973,181. This was 172.44% more than its minimum GDP in 1960.
 ```
 
 ## Creating a Data Package
