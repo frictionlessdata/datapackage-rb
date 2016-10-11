@@ -247,6 +247,32 @@ describe DataPackage::Package do
 
     end
 
+    context "tabular datapackages" do
+
+      it "returns a table" do
+        package = DataPackage::Package.new( test_package_filename )
+        expect(package.resources[0].table.class).to eq(JsonTableSchema::Table)
+      end
+
+      it "returns data in tabular form" do
+        package = DataPackage::Package.new( test_package_filename )
+        data = package.resources[0].table.rows(keyed: true)
+        expect(data).to eq([
+          {"ID"=>"abc", "Price"=>100},
+          {"ID"=>"def", "Price"=>300},
+          {"ID"=>"ghi", "Price"=>750}
+        ])
+      end
+
+      it 'returns nil for non-tabular packages' do
+        filename = File.join( File.dirname(__FILE__), 'fixtures', 'datapackage_with_foo.txt_resource.json' )
+        package = DataPackage::Package.new( filename )
+
+        expect(package.resources[0].table).to eq(nil)
+      end
+
+    end
+
     context "validation" do
 
       it "should validate basic datapackage structure" do

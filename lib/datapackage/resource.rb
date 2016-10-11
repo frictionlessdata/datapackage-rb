@@ -38,6 +38,10 @@ module DataPackage
       return true if base_path.start_with?('http')
     end
 
+    def table
+      @table ||= JsonTableSchema::Table.new(CSV.parse(data), self['schema']) if self['schema']
+    end
+
   end
 
   class LocalResource < Resource

@@ -7,6 +7,7 @@ require 'json-schema'
 require 'rest-client'
 require 'zip'
 require 'ruby_dig'
+require 'jsontableschema'
 
 require 'datapackage/version'
 require 'datapackage/exceptions'
