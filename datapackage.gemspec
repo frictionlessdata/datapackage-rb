@@ -22,6 +22,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'rack', '~> 1.6.4'
   s.add_dependency 'rubyzip'
   s.add_dependency 'ruby_dig'
+  s.add_dependency 'jsontableschema'
 
   s.add_development_dependency 'bundler', '~> 1.3'
   s.add_development_dependency 'rake'
@@ -29,5 +30,4 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'fakeweb', '~> 1.3'
   s.add_development_dependency 'coveralls'
   s.add_development_dependency 'pry'
-  s.add_development_dependency 'henry'
 end

@@ -5,6 +5,7 @@ PATH
       colorize
       json (~> 1.8.3)
       json-schema
+      jsontableschema
       rack (~> 1.6.4)
       rest-client
       ruby_dig
@@ -13,8 +14,7 @@ PATH
 GEM
   remote: http://rubygems.org/
   specs:
-    addressable (2.4.0)
-    backports (3.6.8)
+    addressable (2.3.8)
     coderay (1.1.1)
     colorize (0.8.1)
     coveralls (0.8.15)
@@ -23,76 +23,33 @@ GEM
       term-ansicolor (~> 1.3)
       thor (~> 0.19.1)
       tins (>= 1.6.0, < 2)
-    descendants_tracker (0.0.4)
-      thread_safe (~> 0.3, >= 0.3.1)
+    currencies (0.4.2)
     diff-lcs (1.2.5)
     docile (1.1.5)
     domain_name (0.5.20160826)
       unf (>= 0.0.5, < 1.0.0)
-    ethon (0.9.0)
-      ffi (>= 1.3.0)
     fakeweb (1.3.0)
-    faraday (0.9.2)
-      multipart-post (>= 1.2, < 3)
-    faraday_middleware (0.10.0)
-      faraday (>= 0.7.4, < 0.10)
-    ffi (1.9.14)
-    gh (0.14.0)
-      addressable
-      backports
-      faraday (~> 0.8)
-      multi_json (~> 1.0)
-      net-http-persistent (>= 2.7)
-      net-http-pipeline
-    git (1.3.0)
-    github_api (0.14.5)
-      addressable (~> 2.4.0)
-      descendants_tracker (~> 0.0.4)
-      faraday (~> 0.8, < 0.10)
-      hashie (>= 3.4)
-      oauth2 (~> 1.0)
-    github_changelog_generator (1.9.0)
-      colorize (~> 0.7)
-      github_api (~> 0.12)
-    hashie (3.4.4)
-    henry (0.1.3)
-      git (~> 1.3)
-      github_api (~> 0.13)
-      github_changelog_generator (= 1.9.0)
-      thor (~> 0.19.1)
-      travis (~> 1.8.2)
-    highline (1.7.8)
-    http-cookie (1.0.2)
+    http-cookie (1.0.3)
       domain_name (~> 0.5)
     json (1.8.3)
-    json-schema (2.5.0)
-      addressable (~> 2.3)
-    jwt (1.5.4)
-    launchy (2.4.3)
-      addressable (~> 2.3)
+    json-schema (2.6.2)
+      addressable (~> 2.3.8)
+    jsontableschema (0.1.0)
+      currencies (~> 0.4.2)
+      json-schema (~> 2.6.0)
+      tod (~> 2.1.0)
+      uuid (~> 2.3.8)
+    macaddr (1.7.1)
+      systemu (~> 2.6.2)
     method_source (0.8.2)
     mime-types (3.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2016.0521)
-    multi_json (1.12.1)
-    multi_xml (0.5.5)
-    multipart-post (2.0.0)
-    net-http-persistent (2.9.4)
-    net-http-pipeline (1.0.1)
     netrc (0.11.0)
-    oauth2 (1.2.0)
-      faraday (>= 0.8, < 0.10)
-      jwt (~> 1.0)
-      multi_json (~> 1.3)
-      multi_xml (~> 0.5)
-      rack (>= 1.2, < 3)
     pry (0.10.4)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
       slop (~> 3.4)
-    pusher-client (0.6.2)
-      json
-      websocket (~> 1.0)
     rack (1.6.4)
     rake (11.2.2)
     rest-client (2.0.0)
@@ -120,26 +77,17 @@ GEM
       simplecov-html (~> 0.10.0)
     simplecov-html (0.10.0)
     slop (3.6.0)
+    systemu (2.6.5)
     term-ansicolor (1.3.2)
       tins (~> 1.0)
     thor (0.19.1)
-    thread_safe (0.3.5)
     tins (1.12.0)
-    travis (1.8.2)
-      backports
-      faraday (~> 0.9)
-      faraday_middleware (~> 0.9, >= 0.9.1)
-      gh (~> 0.13)
-      highline (~> 1.6)
-      launchy (~> 2.1)
-      pusher-client (~> 0.4)
-      typhoeus (~> 0.6, >= 0.6.8)
-    typhoeus (0.8.0)
-      ethon (>= 0.8.0)
+    tod (2.1.0)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.2)
-    websocket (1.2.3)
+    uuid (2.3.8)
+      macaddr (~> 1.0)
 
 PLATFORMS
   ruby
@@ -149,10 +97,9 @@ DEPENDENCIES
   coveralls
   datapackage!
   fakeweb (~> 1.3)
-  henry
   pry
   rake
   rspec
 
 BUNDLED WITH
-   1.12.5
+   1.13.1
