@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.1.1](https://github.com/theodi/datapackage.rb/tree/0.1.1) (2016-10-12)
+[Full Changelog](https://github.com/theodi/datapackage.rb/compare/0.1.0...0.1.1)
+
+**Closed issues:**
+
+- Support of tabular resources [\#25](https://github.com/theodi/datapackage.rb/issues/25)
+
 ## [0.1.0](https://github.com/theodi/datapackage.rb/tree/0.1.0) (2016-09-12)
 [Full Changelog](https://github.com/theodi/datapackage.rb/compare/CURRENT...0.1.0)
 
@@ -97,16 +104,16 @@
 - Improve test coverage [\#6](https://github.com/theodi/datapackage.rb/pull/6) ([ldodds](https://github.com/ldodds))
 
 ## [master-2013-12-04_17-43-29](https://github.com/theodi/datapackage.rb/tree/master-2013-12-04_17-43-29) (2013-12-04)
-[Full Changelog](https://github.com/theodi/datapackage.rb/compare/master-2013-12-04_14-15-53...master-2013-12-04_17-43-29)
+[Full Changelog](https://github.com/theodi/datapackage.rb/compare/master-2013-12-04_14-16-07...master-2013-12-04_17-43-29)
 
 **Merged pull requests:**
 
 - Improve validation options [\#3](https://github.com/theodi/datapackage.rb/pull/3) ([ldodds](https://github.com/ldodds))
 
-## [master-2013-12-04_14-15-53](https://github.com/theodi/datapackage.rb/tree/master-2013-12-04_14-15-53) (2013-12-04)
-[Full Changelog](https://github.com/theodi/datapackage.rb/compare/master-2013-12-04_14-16-07...master-2013-12-04_14-15-53)
-
 ## [master-2013-12-04_14-16-07](https://github.com/theodi/datapackage.rb/tree/master-2013-12-04_14-16-07) (2013-12-04)
+[Full Changelog](https://github.com/theodi/datapackage.rb/compare/master-2013-12-04_14-15-53...master-2013-12-04_14-16-07)
+
+## [master-2013-12-04_14-15-53](https://github.com/theodi/datapackage.rb/tree/master-2013-12-04_14-15-53) (2013-12-04)
 **Merged pull requests:**
 
 - Add preferred ruby version and gemset [\#2](https://github.com/theodi/datapackage.rb/pull/2) ([Floppy](https://github.com/Floppy))
