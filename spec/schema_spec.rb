@@ -255,10 +255,8 @@ describe DataPackage::Schema do
 
       errors = @schema.validation_errors(@invalid_datapackage)
       expect(errors.count).to eq(2)
-      expect(errors).to eq([
-        "The property '#/' did not contain a required property of 'name' in schema ccfffe25-174d-53ba-aa73-f63a5565bdb9#",
-        "The property '#/resources/0/name' value \"Test Data\" did not match the regex '^([a-z0-9._-])+$' in schema ccfffe25-174d-53ba-aa73-f63a5565bdb9#"
-      ])
+      expect(errors[0]).to eq("The property '#/' did not contain a required property of 'name' in schema ccfffe25-174d-53ba-aa73-f63a5565bdb9")
+      expect(errors[1]).to eq("The property '#/resources/0/name' value \"Test Data\" did not match the regex '^([a-z0-9._-])+$' in schema ccfffe25-174d-53ba-aa73-f63a5565bdb9")
     end
 
     it 'retuns no errors if data is valid' do
