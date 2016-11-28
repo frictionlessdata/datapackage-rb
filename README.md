@@ -2,7 +2,7 @@
 
 [![Travis](https://travis-ci.org/frictionlessdata/datapackage-rb.svg?branch=master)](https://travis-ci.org/frictionlessdata/datapackage-rb)
 [![Coveralls](http://img.shields.io/coveralls/frictionlessdata/datapackage-rb.svg?branch=master)](https://coveralls.io/r/frictionlessdata/datapackage-rb?branch=master)
-[![Gem Version](http://img.shields.io/gem/v/datapackage.svg?style=flat-square)](https://rubygems.org/gems/datapackage)
+[![Gem Version](http://img.shields.io/gem/v/datapackage.svg)](https://rubygems.org/gems/datapackage)
 [![SemVer](https://img.shields.io/badge/versions-SemVer-brightgreen.svg)](http://semver.org/)
 [![Gitter](https://img.shields.io/gitter/room/frictionlessdata/chat.svg)](https://gitter.im/frictionlessdata/chat)
 
