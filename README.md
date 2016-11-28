@@ -1,11 +1,10 @@
-[![Build Status](http://img.shields.io/travis/theodi/datapackage.rb.svg?style=flat-square)](https://travis-ci.org/theodi/datapackage.rb)
-[![Dependency Status](http://img.shields.io/gemnasium/theodi/datapackage.rb.svg?style=flat-square)](https://gemnasium.com/theodi/datapackage.rb)
-[![Coverage Status](http://img.shields.io/coveralls/theodi/datapackage.rb.svg?style=flat-square)](https://coveralls.io/r/theodi/datapackage.rb)
-[![Code Climate](http://img.shields.io/codeclimate/github/theodi/datapackage.rb.svg?style=flat-square)](https://codeclimate.com/github/theodi/datapackage.rb)
-[![Gem Version](http://img.shields.io/gem/v/datapackage.svg?style=flat-square)](https://rubygems.org/gems/datapackage)
-[![License](http://img.shields.io/:license-mit-blue.svg?style=flat-square)](http://theodi.mit-license.org)
-
 # DataPackage.rb
+
+[![Travis](https://travis-ci.org/frictionlessdata/datapackage-rb.svg?branch=master)](https://travis-ci.org/frictionlessdata/datapackage-rb)
+[![Coveralls](http://img.shields.io/coveralls/frictionlessdata/datapackage-rb.svg?branch=master)](https://coveralls.io/r/frictionlessdata/datapackage-rb?branch=master)
+[![Gem Version](http://img.shields.io/gem/v/datapackage.svg?style=flat-square)](https://rubygems.org/gems/datapackage)
+[![SemVer](https://img.shields.io/badge/versions-SemVer-brightgreen.svg)](http://semver.org/)
+[![Gitter](https://img.shields.io/gitter/room/frictionlessdata/chat.svg)](https://gitter.im/frictionlessdata/chat)
 
 A ruby library for working with [Data Packages](http://dataprotocols.org/data-packages/).
 
