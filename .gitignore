@@ -2,3 +2,4 @@
 .project
 coverage
 *~
+.ruby-version
