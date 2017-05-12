@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.email                 = ['ops@theodi.org']
   s.homepage              = 'http://github.com/theodi/datapackage.rb'
   s.summary               = 'Library for working with data packages'
-  s.files                 = Dir['{bin,etc,lib}/**/*'] + ['LICENSE.md', 'README.md']
+  s.files                 = Dir['{bin,lib,datapackage/schemas}/**/*'] + ['LICENSE.md', 'README.md']
   s.executables           << 'datapackage'
   s.license               = 'MIT'
   s.required_ruby_version = '>= 2.0'
