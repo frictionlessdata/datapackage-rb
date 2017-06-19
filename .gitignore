@@ -2,4 +2,5 @@
 .project
 coverage
 *~
+Gemfile.lock
 .ruby-version
