@@ -10,9 +10,8 @@ deploy:
   api_key:
     secure: K7fTcRGf4oxwkXq5kmntfLDr/+fYK9v7TDa8iR7HOWoerCEYTmuF4S3tozW0xc5aOVWdcVmTubwYp0oLwrzV516kY6SaLrUjUfK6sKSJb6q4E95pObuAcgjTaqFJra99gMplsHcXrSoasQvIjZ4qWiWMsJIR7LAruEuBWyol76c=
   gem: datapackage
-  true:
+  on:
     tags: true
-    repo: theodi/datapackage.rb
 env:
   global:
     secure: YfFmjrohBO4Gbw7oqBVyy9f5jIu01cRLgMUFnyX2ju4RoW75CKetxGG6AqSolbYf+yjO4MO65L2quX/IkqVPFmKLQAVfm6atAaEFir6yC7KmQu792bNPOZ2pfY5NbKP/uq0mLU6tsPPV3TAajm7E9hcBMFIV7PJHuP3UJ6LVlUQ=
