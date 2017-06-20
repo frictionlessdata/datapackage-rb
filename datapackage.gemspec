@@ -17,9 +17,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'json', '~> 1.8.3'
   s.add_dependency 'json-schema'
-  s.add_dependency 'rest-client'
   s.add_dependency 'colorize'
-  s.add_dependency 'rack', '~> 1.6.4'
   s.add_dependency 'rubyzip'
   s.add_dependency 'ruby_dig'
   s.add_dependency 'jsontableschema'
