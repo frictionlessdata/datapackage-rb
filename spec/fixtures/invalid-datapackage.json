@@ -1,9 +1,10 @@
 {
     "title": "Test Package",
     "description": "Description",
-    "homepage": "http://example.org",
+    "homepage": {
+      "path": "http://example.org"
+    },
     "last_modified": "2013-12-05",
-    "version": "0.0.1",
     "licenses": [{
         "id": "odc-pddl",
         "url": "http://opendatacommons.org/licenses/pddl/1.0/"

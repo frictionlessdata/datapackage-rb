@@ -12,9 +12,9 @@ module DataPackage
     # package:: Hash or a String
     # schema:: Hash, Symbol or String
     # opts:: Options used to customize reading and parsing
-    def initialize(package = nil, schema = :base, opts = {})
+    def initialize(package = nil, schema = 'data-package', opts = {})
       @opts = opts
-      @schema = DataPackage::Schema.new(schema || :base)
+      @schema = DataPackage::Schema.new(schema || 'data-package')
       @dead_resources = []
 
       self.merge! parse_package(package)

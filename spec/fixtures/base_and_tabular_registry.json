@@ -1,0 +1,16 @@
+[
+  {
+    "id": "base",
+    "title": "Data Package",
+    "schema": "http://example.com/one.json",
+    "schema_path": "base_profile.json",
+    "specification": "http://example.com"
+  },
+  {
+    "id": "tabular",
+    "title": "Tabular Data Package",
+    "schema": "http://example.com/two.json",
+    "schema_path": "tabular_profile.json",
+    "specification": "http://example.com"
+  }
+]

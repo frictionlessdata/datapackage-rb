@@ -36,21 +36,21 @@ describe DataPackage::Schema do
     end
 
     it 'loads a schema from the registry' do
-      schema = DataPackage::Schema.new(:base)
+      schema = DataPackage::Schema.new('tabular-data-package')
 
-      expect(schema['properties'].count).to eq 13
+      expect(schema).to_not be_empty
     end
 
     it 'loads a schema from a custom registry' do
-      registry_path = File.join('spec', 'fixtures', 'base_registry.csv')
+      registry_path = File.join('spec', 'fixtures', 'base_registry.json')
       schema_path = File.join('spec', 'fixtures', 'fake_schema.json')
 
-      registry_url = 'http://some-place.com/registry.csv'
+      registry_url = 'http://some-place.com/registry.json'
 
       FakeWeb.register_uri(:get, registry_url, :body => File.read(registry_path))
       FakeWeb.register_uri(:get, 'http://example.com/one.json', :body => File.read(schema_path))
 
-      schema = DataPackage::Schema.new(:base, registry_url: registry_url)
+      schema = DataPackage::Schema.new('base', registry_url: registry_url)
 
       expect(schema).to eq ({
         'key' => 'value'
@@ -108,15 +108,9 @@ describe DataPackage::Schema do
       end
 
       specify 'from a registry' do
-        schema = DataPackage::Schema.new(:base)
+        schema = DataPackage::Schema.new('data-package')
 
-        expect(schema['properties']['name']).to eq({
-          "propertyOrder" => 10,
-          "title" => "Name",
-          "description" => "An identifier for this package. Lower case characters with '.', '_' and '-' are allowed.",
-          "type" => "string",
-          "pattern" => "^([a-z0-9._-])+$"
-        })
+        expect(schema['properties']['name']['type']).to eq('string')
       end
     end
 
@@ -186,7 +180,6 @@ describe DataPackage::Schema do
 
         expect { DataPackage::Schema.new(path) }.to raise_exception { |exception|
           expect(exception).to be_a DataPackage::SchemaException
-          expect(exception.status).to eq ("Path 'spec/fixtures/not_a_path.json' does not exist")
         }
 
       end
@@ -228,11 +221,9 @@ describe DataPackage::Schema do
 
         expect { DataPackage::Schema.new(a) }.to raise_exception { |exception|
           expect(exception).to be_a DataPackage::SchemaException
-          expect(exception.message).to eq ("Schema must be a URL, path, Hash or registry-identifier")
+          expect(exception.message).to eq ("Schema must be a URL, path, Hash or registry identifier")
         }
       end
-
-      it 'when the schema is invalid'
 
     end
 
@@ -241,7 +232,7 @@ describe DataPackage::Schema do
   context 'validate' do
 
     before(:each) do
-      @schema = DataPackage::Schema.new(:base)
+      @schema = DataPackage::Schema.new('data-package')
       @valid_datapackage = JSON.parse(File.read File.join('spec', 'fixtures', 'test-pkg', 'valid-datapackage.json'))
       @invalid_datapackage = JSON.parse(File.read File.join('spec', 'fixtures', 'invalid-datapackage.json'))
     end
@@ -255,8 +246,6 @@ describe DataPackage::Schema do
 
       errors = @schema.validation_errors(@invalid_datapackage)
       expect(errors.count).to eq(2)
-      expect(errors[0]).to eq("The property '#/' did not contain a required property of 'name' in schema ccfffe25-174d-53ba-aa73-f63a5565bdb9")
-      expect(errors[1]).to eq("The property '#/resources/0/name' value \"Test Data\" did not match the regex '^([a-z0-9._-])+$' in schema ccfffe25-174d-53ba-aa73-f63a5565bdb9")
     end
 
     it 'retuns no errors if data is valid' do

@@ -1,11 +1,10 @@
 module DataPackage
-  ##
   # Allow loading Data Package profiles from a registry.
 
   class Registry
 
-    DEFAULT_REGISTRY_URL = 'http://schemas.datapackages.org/registry.csv'
-    DEFAULT_REGISTRY_PATH = File.join(File.expand_path(File.dirname(__FILE__)), '..', '..', 'datapackage', 'schemas', 'registry.csv')
+    DEFAULT_REGISTRY_URL = 'https://specs.frictionlessdata.io/schemas/registry.json'
+    DEFAULT_REGISTRY_PATH = File.join(File.expand_path(File.dirname(__FILE__)), '..', 'profiles', 'registry.json')
 
     attr_reader :base_path
 
@@ -34,25 +33,24 @@ module DataPackage
         profile_metadata = @registry[profile_id]
         return if profile_metadata.nil?
 
-        path = get_absolute_path(profile_metadata[:schema_path])
+        path = get_absolute_path(profile_metadata['schema_path'])
 
         if path && File.file?(path)
           load_json(path)
         else
-          url = profile_metadata[:schema]
+          url = profile_metadata['schema']
           load_json(url)
         end
       end
 
       def get_registry(registry_path_or_url)
-        begin
-          csv = parse_csv(registry_path_or_url)
-          registry = {}
-          csv.each { |row| registry[row.fetch(:id)] = Hash[row.headers.zip(row.fields)] }
-        rescue KeyError, OpenURI::HTTPError, Errno::ENOENT
-          raise(RegistryError)
+        resources = load_json(registry_path_or_url)
+        resources.reduce({}) do |registry, resource|
+          registry[resource['id']] = resource
+          registry
         end
-        registry
+      rescue KeyError, OpenURI::HTTPError, Errno::ENOENT
+        raise RegistryError
       end
 
       def parse_csv(path_or_url)

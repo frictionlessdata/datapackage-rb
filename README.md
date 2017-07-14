@@ -148,10 +148,17 @@ package = DataPackage::Package.new(nil, :identifier, {registry_url: 'http://exam
 
 These notes are intended to help people that want to contribute to this package itself. If you just want to use it, you can safely ignore them.
 
+After checking out the repo, run `bundle` to install dependencies. Then, run `rake spec` to run the tests.
+
+To install this gem onto your local machine, run `bundle exec rake install`.
+To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`,
+which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+
 ### Updating the local schemas cache
 
-We cache the schemas from https://github.com/dataprotocols/schemas using git-subtree. To update it, use:
+We cache the local schemas from https://specs.frictionlessdata.io/schemas/registry.json.
+The local schemas should be kept up to date with the remote ones using:
 
 ```
-  git subtree pull --prefix datapackage/schemas https://github.com/dataprotocols/schemas.git master --squash
+rake update_profiles
 ```

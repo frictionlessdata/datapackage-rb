@@ -1,0 +1,8 @@
+[
+  {
+    "id": "base",
+    "title": "Data Package",
+    "schema": "http://example.com/one.json",
+    "specification": "http://example.com"
+  }
+]
