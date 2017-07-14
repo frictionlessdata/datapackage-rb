@@ -1,0 +1,9 @@
+[
+  {
+    "id": "notajson",
+    "title": "Not a JSON",
+    "schema": "http://example.com/one.json",
+    "specification": "http://example.com",
+    "schema_path": "not_a_json"
+  }
+]

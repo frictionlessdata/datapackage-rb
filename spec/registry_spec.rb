@@ -3,17 +3,17 @@ require 'spec_helper'
 describe DataPackage::Registry do
 
   before(:each) do
-    @base_registry_path = File.join('spec', 'fixtures', 'base_registry.csv')
-    @empty_registry_path = File.join('spec', 'fixtures', 'empty_registry.csv')
-    @base_and_tabular_registry_path = File.join('spec', 'fixtures', 'base_and_tabular_registry.csv')
-    @unicode_registry_path = File.join('spec', 'fixtures', 'unicode_registry.csv')
+    @base_registry_path = File.join('spec', 'fixtures', 'base_registry.json')
+    @empty_registry_path = File.join('spec', 'fixtures', 'empty_registry.json')
+    @base_and_tabular_registry_path = File.join('spec', 'fixtures', 'base_and_tabular_registry.json')
+    @unicode_registry_path = File.join('spec', 'fixtures', 'unicode_registry.json')
     @base_profile_path = File.join('spec', 'fixtures', 'base_profile.json')
   end
 
   context 'initialize' do
 
     before(:each) do
-      @url = 'http://some-place.com/registry.csv'
+      @url = 'http://some-place.com/registry.json'
       @body = File.read(@base_registry_path)
     end
 
@@ -24,15 +24,15 @@ describe DataPackage::Registry do
 
       expect(registry.available_profiles.values.count).to eq(1)
       expect(registry.available_profiles['base']).to eq({
-          id: 'base',
-          title: 'Data Package',
-          schema: 'http://example.com/one.json',
-          specification: 'http://example.com'
+          'id'=> 'base',
+          'title'=> 'Data Package',
+          'schema'=> 'http://example.com/one.json',
+          'specification'=> 'http://example.com'
       })
     end
 
     it 'has a default registry url' do
-      default_url = 'http://schemas.datapackages.org/registry.csv'
+      default_url = 'https://specs.frictionlessdata.io/schemas/registry.json'
 
       expect(DataPackage::Registry::DEFAULT_REGISTRY_URL).to eq(default_url)
     end
@@ -42,10 +42,10 @@ describe DataPackage::Registry do
 
       expect(registry.available_profiles.values.count).to eq(1)
       expect(registry.available_profiles['base']).to eq({
-          id: 'base',
-          title: 'Data Package',
-          schema: 'http://example.com/one.json',
-          specification: 'http://example.com'
+          'id'=> 'base',
+          'title'=> 'Data Package',
+          'schema'=> 'http://example.com/one.json',
+          'specification'=> 'http://example.com'
       })
     end
 
@@ -53,7 +53,7 @@ describe DataPackage::Registry do
 
   context 'raises an error' do
 
-    it 'if registry is not a CSV' do
+    it 'if registry is not a JSON' do
       url = 'http://some-place.com/registry.txt'
 
       FakeWeb.register_uri(:get, url, :body => "foo")
@@ -116,18 +116,18 @@ describe DataPackage::Registry do
 
       expect(registry.available_profiles.values.count).to eq(2)
       expect(registry.available_profiles['base']).to eq({
-          id: 'base',
-          title: 'Data Package',
-          schema: 'http://example.com/one.json',
-          schema_path: 'base_profile.json',
-          specification: 'http://example.com'
+          'id'=> 'base',
+          'title'=> 'Data Package',
+          'schema'=> 'http://example.com/one.json',
+          'schema_path'=> 'base_profile.json',
+          'specification'=> 'http://example.com'
       })
       expect(registry.available_profiles['tabular']).to eq({
-          id: 'tabular',
-          title: 'Tabular Data Package',
-          schema: 'http://example.com/two.json',
-          schema_path: 'tabular_profile.json',
-          specification: 'http://example.com'
+          'id'=> 'tabular',
+          'title'=> 'Tabular Data Package',
+          'schema'=> 'http://example.com/two.json',
+          'schema_path'=> 'tabular_profile.json',
+          'specification'=> 'http://example.com'
       })
     end
 
@@ -141,7 +141,7 @@ describe DataPackage::Registry do
 
       expect(registry.available_profiles.values.count).to eq(2)
       base_profile_metadata = registry.available_profiles['base']
-      expect(base_profile_metadata[:title]).to eq('Iñtërnâtiônàlizætiøn')
+      expect(base_profile_metadata['title']).to eq('Iñtërnâtiônàlizætiøn')
     end
 
   end
@@ -157,18 +157,23 @@ describe DataPackage::Registry do
     end
 
     it 'loads remote file if local copy does not exist' do
-      body = [
-        'id,title,schema,specification,schema_path',
-        'base,Data Package,http://example.com/one.json,http://example.com,inexistent.json'
-      ].join("\r\n")
+      registry = [
+        {
+          'id'=> "base",
+          'title'=> "Data Package",
+          'schema'=> "http://example.com/one.json",
+          'schema_path'=> "inexistent.json",
+          'specification'=> "http://example.com"
+        }
+      ]
 
       profile_url = 'http://example.com/one.json'
       profile_body = '{ "title": "base_profile" }'
 
       FakeWeb.register_uri(:get, profile_url, :body => profile_body)
 
-      tempfile = Tempfile.new('.csv')
-      tempfile.write(body)
+      tempfile = Tempfile.new('.json')
+      tempfile.write(JSON.dump(registry))
       tempfile.rewind
 
       registry = DataPackage::Registry.new(tempfile.path)
@@ -181,22 +186,27 @@ describe DataPackage::Registry do
     context 'raises an error' do
 
       it 'if profile is not json' do
-        registry_path = File.join('spec', 'fixtures', 'registry_with_notajson_profile.csv')
+        registry_path = File.join('spec', 'fixtures', 'registry_nonjson_profile.json')
         registry = DataPackage::Registry.new(registry_path)
 
         expect { registry.get('notajson') }.to raise_error(DataPackage::RegistryError)
       end
 
       it 'remote profile file does not exist' do
-        registry_url = 'http://example.com/registry.csv'
+        registry_url = 'http://example.com/registry.json'
         profile_url = 'http://example.com/one.json'
 
         registry_body = [
-          'id,title,schema,specification,schema_path',
-          'base,Data Package,http://example.com/one.json,http://example.com,base.json'
-        ].join("\r\n")
+          {
+            'id'=> 'base',
+            'title'=> 'Data Package',
+            'schema'=> 'http://example.com/one.json',
+            'schema_path'=> 'base.json',
+            'specification'=> 'http://example.com'
+          }
+        ]
 
-        FakeWeb.register_uri(:get, registry_url, :body => registry_body)
+        FakeWeb.register_uri(:get, registry_url, :body => JSON.dump(registry_body))
         FakeWeb.register_uri(:get, profile_url, :body => "", :status => ["404", "Not Found"])
 
         registry = DataPackage::Registry.new(registry_url)
@@ -205,10 +215,16 @@ describe DataPackage::Registry do
       end
 
       it 'local profile file does not exist' do
-        body = [
-          'id,title,schema,specification,schema_path',
-          'base,Data Package,http://example.com/one.json,http://example.com,inexistent.json'
-        ].join("\r\n")
+
+        registry_body = [
+          {
+            'id'=> 'base',
+            'title'=> 'Data Package',
+            'schema'=> 'http://example.com/one.json',
+            'schema_path'=> 'inexistent.json',
+            'specification'=> 'http://example.com'
+          }
+        ]
 
         profile_url = 'http://example.com/one.json'
         profile_body = '{ "title": "base_profile" }'
@@ -216,7 +232,7 @@ describe DataPackage::Registry do
         FakeWeb.register_uri(:get, profile_url, :body => "", :status => ["404", "Not Found"])
 
         tempfile = Tempfile.new('.csv')
-        tempfile.write(body)
+        tempfile.write(JSON.dump(registry_body))
         tempfile.rewind
 
         registry = DataPackage::Registry.new(tempfile.path)

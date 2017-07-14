@@ -7,12 +7,10 @@ module DataPackage
       @registry_url = options[:registry_url]
       if schema.class == Hash
         self.merge! schema
-      elsif schema.class == Symbol
-        self.merge! get_schema_from_registry schema
       elsif schema.class == String
         self.merge! load_schema(schema)
       else
-        raise SchemaException.new "Schema must be a URL, path, Hash or registry-identifier"
+        raise SchemaException.new "Schema must be a URL, path, Hash or registry identifier"
       end
     end
 
@@ -79,24 +77,28 @@ module DataPackage
       end
     end
 
-    def load_schema(path_or_url)
-      json = open(path_or_url).read
+    def load_schema(schema_reference)
+      json = open(schema_reference).read
       schema = JSON.parse json
-      s = dereference_schema path_or_url, schema
+      s = dereference_schema(schema_reference, schema)
 
-    rescue OpenURI::HTTPError => e
+    rescue Errno::ENOENT
+      get_schema_from_registry(schema_reference)
+
+    rescue OpenURI::HTTPError, SocketError => e
       raise SchemaException.new "Schema URL returned #{e.message}"
 
     rescue JSON::ParserError
       raise SchemaException.new 'Schema is not valid JSON'
-
-    rescue Errno::ENOENT
-      raise SchemaException.new "Path '#{path_or_url}' does not exist"
     end
 
-    def get_schema_from_registry schema
-      d = DataPackage::Registry.new(@registry_url)
-      dereference_schema (@registry_url || d.base_path), d.get(schema.to_s)
+    def get_schema_from_registry(schema_reference)
+      registry = DataPackage::Registry.new(@registry_url)
+      schema_metadata = registry.get(schema_reference)
+      if schema_metadata.nil?
+        raise SchemaException.new "Couldn't find file or registry entry for schema reference `#{schema_reference}`"
+      end
+      dereference_schema((@registry_url || registry.base_path), registry.get(schema_reference))
     end
 
     def valid?(package)

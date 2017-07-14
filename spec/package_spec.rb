@@ -127,35 +127,31 @@ describe DataPackage::Package do
           expect( package.name ).to eql("test-package")
           expect( package.title ).to eql("Test Package")
           expect( package.description ).to eql("Description")
-          expect( package.homepage ).to eql("http://example.org")
-          expect( package.version ).to eql("0.0.1")
+          expect( package.created ).to eq(nil)
+          expect( package.homepage ).to eql({ "path"=> "http://example.org" })
           [:sources, :contributors].each do |key|
               expect( package.send(key) ).to eql([])
           end
-          expect( package.dataDependencies ).to eql({})
           expect( package.sources ).to eql([])
           expect( package.keywords ).to eql( [ "test", "testing" ] )
-          expect( package.image ).to eql(nil)
           expect( package.resources.length ).to eql(1)
       end
 
       it "should load from a zip file" do
         path = File.join( File.dirname(__FILE__), "fixtures", "test-pkg.zip" )
 
-        package = DataPackage::Package.new( path )
+        package = DataPackage::Package.new(path)
 
         expect( package.name ).to eql("test-package")
         expect( package.title ).to eql("Test Package")
         expect( package.description ).to eql("Description")
-        expect( package.homepage ).to eql("http://example.org")
-        expect( package.version ).to eql("0.0.1")
+        expect( package.created ).to eq(nil)
+        expect( package.homepage ).to eql({ "path"=> "http://example.org" })
         [:sources, :contributors].each do |key|
             expect( package.send(key) ).to eql([])
         end
-        expect( package.dataDependencies ).to eql({})
         expect( package.sources ).to eql([])
         expect( package.keywords ).to eql( [ "test", "testing" ] )
-        expect( package.image ).to eql(nil)
         expect( package.resources.length ).to eql(1)
       end
 
