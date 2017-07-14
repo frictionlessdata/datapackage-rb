@@ -12,6 +12,7 @@ Gem::Specification.new do |s|
   s.summary               = 'Library for working with data packages'
   s.files                 = Dir['{bin,lib,datapackage/schemas}/**/*'] + ['LICENSE.md', 'README.md']
   s.executables           << 'datapackage'
+  s.executables           << 'console'
   s.license               = 'MIT'
   s.required_ruby_version = '>= 2.0'
 
