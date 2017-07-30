@@ -9,4 +9,6 @@ module DataPackage
       @message = status
     end
   end
+
+  class ReferenceException < Exception; end
 end
