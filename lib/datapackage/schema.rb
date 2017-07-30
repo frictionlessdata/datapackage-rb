@@ -31,7 +31,7 @@ module DataPackage
       else
         begin
           resolve_reference(schema_reference)
-        rescue ReferenceException
+        rescue Errno::ENOENT
           get_schema_from_registry(schema_reference)
         end
       end
