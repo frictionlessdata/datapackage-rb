@@ -22,7 +22,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'rubyzip'
   s.add_dependency 'ruby_dig'
   s.add_dependency 'jsontableschema'
-  s.add_dependency 'hana', '~> 1.3'
 
   s.add_development_dependency 'bundler', '~> 1.3'
   s.add_development_dependency 'rake'

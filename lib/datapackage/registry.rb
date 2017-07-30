@@ -59,7 +59,7 @@ module DataPackage
       end
 
       def get_registry(registry_path_or_url)
-        resources = load_json(registry_path_or_url)
+        resources = resolve_reference(registry_path_or_url)
         resources.reduce({}) do |registry, resource|
           registry[resource['id']] = resource
           registry

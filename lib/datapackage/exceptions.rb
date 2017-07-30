@@ -10,5 +10,4 @@ module DataPackage
     end
   end
 
-  class ReferenceException < Exception; end
 end

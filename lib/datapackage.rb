@@ -7,7 +7,6 @@ require 'json-schema'
 require 'zip'
 require 'ruby_dig'
 require 'jsontableschema'
-require 'hana'
 
 require 'datapackage/helpers'
 require 'datapackage/version'

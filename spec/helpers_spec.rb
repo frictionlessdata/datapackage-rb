@@ -11,25 +11,6 @@ describe DataPackage::Helpers do
       expect(dereference_resource(hash)).to eq(hash)
     end
 
-    it 'dereferences pointers' do
-      hash = {
-        'resources'=> [{'fields'=>{'$ref'=> '#schemas/main/fields'}}],
-        'schemas'=> {
-          'main'=> {
-            'fields'=> [{'name'=> 'name'}]
-          }
-        }
-      }
-      expect(dereference_resource(hash)).to eq({
-        'resources'=> [{'fields'=> [{'name'=> 'name'}]}],
-        'schemas'=> {
-          'main'=> {
-            'fields'=> [{'name'=> 'name'}]
-          }
-        }
-      })
-    end
-
     it 'dereferences URLs' do
       url = 'http://example.org/thing.json'
       nested_url = 'http://example.org/nested_thing.json'
