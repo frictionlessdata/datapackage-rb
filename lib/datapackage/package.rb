@@ -50,7 +50,7 @@ module DataPackage
     # Is this a local package? Returns true if created from an in-memory object or a file/directory reference
     def local?
       return @local if @local
-      return !@location.start_with?('http') if @location
+      return false if @location =~ /\A#{URI::regexp}\z/
       true
     end
 

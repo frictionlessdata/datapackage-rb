@@ -11,6 +11,4 @@ module DataPackage
       @message = status
     end
   end
-
-
 end
