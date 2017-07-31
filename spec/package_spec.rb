@@ -25,7 +25,7 @@ describe DataPackage::Package do
       it "allows a schema to be specified" do
         schema = {'foo' => 'bar'}
 
-        package = DataPackage::Package.new(nil, schema)
+        package = DataPackage::Package.new(nil, schema: schema)
 
         expect(package.instance_variable_get("@schema")).to eq(schema)
       end
@@ -41,7 +41,7 @@ describe DataPackage::Package do
             'path' => file
           }
 
-          expect(package.resources[0]).to be_a_kind_of(DataPackage::LocalResource)
+          expect(package.resources[0]).to be_a_kind_of(DataPackage::Resource)
           expect(package.resources[0].data).to eq(File.read(file))
         end
 
@@ -54,10 +54,10 @@ describe DataPackage::Package do
           package = DataPackage::Package.new
 
           package.resources << {
-            'url' => url
+            'path' => url
           }
 
-          expect(package.resources[0]).to be_a_kind_of(DataPackage::RemoteResource)
+          expect(package.resources[0]).to be_a_kind_of(DataPackage::Resource)
           expect(package.resources[0].data).to eq(File.read(file))
         end
 
@@ -71,7 +71,7 @@ describe DataPackage::Package do
             'data' => data
           }
 
-          expect(package.resources[0]).to be_a_kind_of(DataPackage::InlineResource)
+          expect(package.resources[0]).to be_a_kind_of(DataPackage::Resource)
           expect(package.resources[0].data).to eq(data)
         end
 
@@ -156,15 +156,17 @@ describe DataPackage::Package do
       end
 
       it "should load from a directory" do
-          package = DataPackage::Package.new( File.join( File.dirname(__FILE__), "fixtures", "test-pkg"), nil,
-              {:default_filename=>"valid-datapackage.json"})
-          expect( package.name ).to eql("test-package")
-          expect( package.resources.length ).to eql(1)
+        package = DataPackage::Package.new(File.join( File.dirname(__FILE__), "fixtures", "test-pkg"),
+          opts: {:default_filename=>"valid-datapackage.json"})
+        expect( package.name ).to eql("test-package")
+        expect( package.resources.length ).to eql(1)
       end
 
       it "should load from an explicit URL" do
           FakeWeb.register_uri(:get, "http://example.com/datapackage.json",
               :body => File.read( test_package_filename ) )
+          FakeWeb.register_uri(:get, "http://example.com/test.csv",
+              :body => File.read( test_resource_filename ) )
           package = DataPackage::Package.new( "http://example.com/datapackage.json" )
           expect( package.name ).to eql("test-package")
           expect( package.resources.length ).to eql(1)
@@ -215,7 +217,7 @@ describe DataPackage::Package do
           filename = File.join( File.dirname(__FILE__), 'fixtures', 'datapackage_with_foo.txt_resource.json' )
           package = DataPackage::Package.new(filename)
 
-          expect(package.resources[0]).to be_a_kind_of(DataPackage::LocalResource)
+          expect(package.resources[0]).to be_a_kind_of(DataPackage::Resource)
           expect(package.resources[0].data).to eq("bar\n")
         end
 
@@ -298,7 +300,7 @@ describe DataPackage::Package do
             'required' => ['name']
         }
 
-        package = DataPackage::Package.new({}, schema)
+        package = DataPackage::Package.new({}, schema: schema)
         expect(package.valid?).to eq(false)
 
         package.name = 'A name'

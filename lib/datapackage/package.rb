@@ -2,34 +2,34 @@ require 'open-uri'
 
 module DataPackage
   class Package < Hash
+    include DataPackage::Helpers
+
     attr_reader :opts, :errors
     attr_writer :resources
 
     # Parse or create a data package
-    #
     # Supports reading data from JSON file, directory, and a URL
-    #
-    # package:: Hash or a String
-    # schema:: Hash, Symbol or String
-    # opts:: Options used to customize reading and parsing
-    def initialize(package = nil, schema = 'data-package', opts = {})
+      # descriptor:: Hash or String
+      # schema:: Hash or String
+      # opts:: Options used to customize reading and parsing
+    def initialize(descriptor = nil, schema: 'data-package', opts: {})
       @opts = opts
-      @schema = DataPackage::Schema.new(schema || 'data-package')
+      @schema = DataPackage::Schema.new(schema)
       @dead_resources = []
 
-      self.merge! parse_package(package)
+      self.merge! parse_package(descriptor)
       define_properties!
       load_resources!
     end
 
-    def parse_package(package)
+    def parse_package(descriptor)
       # TODO: base directory/url
-      if package.nil?
+      if descriptor.nil?
         {}
-      elsif package.class == Hash
-        package
+      elsif descriptor.class == Hash
+        descriptor
       else
-        read_package(package)
+        read_package(descriptor)
       end
     end
 
@@ -100,7 +100,7 @@ module DataPackage
       @resources.map! do |resource|
         begin
           load_resource(resource)
-        rescue
+        rescue ResourceError
           @dead_resources << resource['path']
           nil
         end
@@ -111,7 +111,7 @@ module DataPackage
       if resource.is_a?(Resource)
         resource
       else
-        Resource.load(resource, base)
+        Resource.new(resource, base)
       end
     end
 
@@ -130,45 +130,26 @@ module DataPackage
       self[key] = value
     end
 
-    def read_package(package)
-      if is_directory?(package)
-          package = File.join(package, opts[:default_filename] || 'datapackage.json')
-      elsif is_containing_url?(package)
-          package = URI.join(package, 'datapackage.json')
-      end
-
-      @location = package.to_s
-
-      if File.extname(package.to_s) == '.zip'
-          unzip_package(package)
+    def read_package(descriptor)
+      default_filename = @opts[:default_filename] || 'datapackage.json'
+      descriptor = join_paths(descriptor, default_filename)
+      @location = descriptor.to_s
+      if File.extname(descriptor.to_s) == '.zip'
+          unzip_package(descriptor)
       else
-          JSON.parse open(package).read
+          load_json(descriptor)
       end
     end
 
-    def is_directory?(package)
-      !package.start_with?('http') && File.directory?(package)
-    end
-
-    def is_containing_url?(package)
-      package.start_with?('http') && !package.end_with?('datapackage.json', 'datapackage.zip')
-    end
-
-    def write_to_tempfile(url)
-      tempfile = Tempfile.new('datapackage')
-      tempfile.write(open(url).read)
-      tempfile.rewind
-      tempfile
-    end
-
-    def unzip_package(package)
-      package = write_to_tempfile(package) if package.start_with?('http')
+    def unzip_package(descriptor)
+      descriptor = write_to_tempfile(descriptor) if descriptor =~ /\A#{URI::regexp}\z/
       dir = Dir.mktmpdir
-      Zip::File.open(package) do |zip_file|
+      package = {}
+      Zip::File.open(descriptor) do |zip_file|
           # Extract all the files
           zip_file.each { |entry| entry.extract("#{dir}/#{File.basename entry.name}") }
           # Get and parse the datapackage metadata
-          entry = zip_file.glob("*/#{opts[:default_filename] || 'datapackage.json'}").first
+          entry = zip_file.glob("*/#{@opts[:default_filename] || 'datapackage.json'}").first
           package = JSON.parse(entry.get_input_stream.read)
       end
       # Set the base dir to the directory we unzipped to
@@ -176,6 +157,13 @@ module DataPackage
       # This is now a local file, not a URL
       @local = true
       package
+    end
+
+    def write_to_tempfile(url)
+      tempfile = Tempfile.new('datapackage')
+      tempfile.write(open(url).read)
+      tempfile.rewind
+      tempfile
     end
   end
 end

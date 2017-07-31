@@ -133,7 +133,7 @@ By default, the gem uses the standard [Data Package Schema](http://specs.frictio
 The gem comes with schemas for the standard Data Package Schema, as well as the [Tabular Data Package Schema](http://specs.frictionlessdata.io/tabular-data-package/), and the [Fiscal Data Package Schema](http://fiscal.dataprotocols.org/spec/). These can be referred to via an identifier, expressed as a symbol.
 
 ```ruby
-package = DataPackage::Package.new(nil, :tabular) # Or :fiscal
+package = DataPackage::Package.new(nil, schema: 'tabular-data-package') # Or 'fiscal-data-package'
 ```
 
 ### Schemas from elsewhere
@@ -141,7 +141,7 @@ package = DataPackage::Package.new(nil, :tabular) # Or :fiscal
 If you have a schema stored in an alternative registry, you can pass a `registry_url` option to the initializer.
 
 ```ruby
-package = DataPackage::Package.new(nil, :identifier, {registry_url: 'http://example.org/my-registry.csv'} )
+package = DataPackage::Package.new(nil, schema: 'profile-id', {registry_url: 'http://example.org/my-registry.csv'} )
 ```
 
 ## Developer notes

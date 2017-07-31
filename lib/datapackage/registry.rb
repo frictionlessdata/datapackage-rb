@@ -8,15 +8,15 @@ module DataPackage
     DEFAULT_REGISTRY_URL = 'https://specs.frictionlessdata.io/schemas/registry.json'
     DEFAULT_REGISTRY_PATH = File.join(File.expand_path(File.dirname(__FILE__)), '..', 'profiles', 'registry.json')
 
-    def initialize(registry_path_or_url = DEFAULT_REGISTRY_PATH)
-      registry_path_or_url ||= DEFAULT_REGISTRY_PATH
-      if File.file?(registry_path_or_url)
+    def initialize(descriptor = DEFAULT_REGISTRY_PATH)
+      descriptor ||= DEFAULT_REGISTRY_PATH
+      if File.file?(descriptor)
         @base_path = File.dirname(
-          File.absolute_path(registry_path_or_url)
+          File.absolute_path(descriptor)
         )
       end
       @profiles = {}
-      @registry = get_registry(registry_path_or_url)
+      @registry = get_registry(descriptor)
       self
     rescue Errno::ENOENT
       raise RegistryError.new 'Registry path is not valid'
@@ -58,8 +58,8 @@ module DataPackage
         raise RegistryError.new 'Profile descriptor is not valid JSON'
       end
 
-      def get_registry(registry_path_or_url)
-        resources = resolve_reference(registry_path_or_url)
+      def get_registry(descriptor)
+        resources = resolve_json_reference(descriptor)
         resources.reduce({}) do |registry, resource|
           registry[resource['id']] = resource
           registry
