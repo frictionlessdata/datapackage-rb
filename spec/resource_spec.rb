@@ -1,67 +1,116 @@
 describe DataPackage::Resource do
 
-  context "returns the right type of resource" do
+  context 'remote resource' do
 
-    it "for a local resource" do
-      resource = {
+    before(:each) do
+      @url = 'http://example.com/test.csv'
+      FakeWeb.register_uri(:get, @url,
+          :body => File.read( test_package_filename('test.csv') ) )
+    end
+
+    it 'returns the resource' do
+      resource_hash = {
+        'foo' => 'bar',
+        'path' => @url
+      }
+
+      resource = DataPackage::Resource.new(resource_hash)
+
+      expect(resource).to eq(resource_hash)
+    end
+
+    it 'loads the data from a url' do
+      resource_hash = {
+        'foo' => 'bar',
+        'path' => @url
+      }
+
+      resource = DataPackage::Resource.new(resource_hash)
+      expect(resource.data).to eq(File.read(test_package_filename('test.csv')))
+    end
+
+    it 'loads the data with a base url' do
+      resource_hash = {
+        'foo' => 'bar',
+        'path' => 'test.csv'
+      }
+
+      base_url = 'http://example.com/'
+
+      resource = DataPackage::Resource.new(resource_hash, base_url)
+      expect(resource.data).to eq(File.read(test_package_filename('test.csv')))
+    end
+
+  end
+
+  context 'local resource' do
+
+    it 'returns the resource' do
+      resource_hash = {
+        'foo' => 'bar',
         'path' => test_package_filename('test.csv')
       }
 
-      expect(DataPackage::Resource.load(resource)).to be_a_kind_of(DataPackage::LocalResource)
+      resource = DataPackage::Resource.new(resource_hash)
+
+      expect(resource).to eq(resource_hash)
     end
 
-    it "for a remote resource" do
-      resource = {
-        'url' => 'http://example.com/test.csv'
+    it 'loads the data lazily' do
+      resource_hash = {
+        'foo' => 'bar',
+        'path' => test_package_filename('test.csv')
       }
 
-      expect(DataPackage::Resource.load(resource)).to be_a_kind_of(DataPackage::RemoteResource)
+      resource = DataPackage::Resource.new(resource_hash)
+      expect(resource.data).to eq(File.read(test_package_filename('test.csv')))
     end
 
-    it "for a inline resource" do
-      resource = {
+    it 'loads the data with a base path' do
+      resource_hash = {
+        'foo' => 'bar',
+        'path' => 'test.csv'
+      }
+
+      base_path = File.join( File.dirname(__FILE__), "fixtures", "test-pkg" )
+
+      resource = DataPackage::Resource.new(resource_hash, base_path)
+      expect(resource.data).to eq(File.read(test_package_filename('test.csv')))
+    end
+
+  end
+
+  context 'inline resource' do
+
+    it 'returns the resource' do
+      resource_hash = {
+        'foo' => 'bar',
         'data' => 'whevs'
       }
 
-      expect(DataPackage::Resource.load(resource)).to be_a_kind_of(DataPackage::InlineResource)
+      resource = DataPackage::Resource.new(resource_hash)
+
+      expect(resource).to eq(resource_hash)
     end
 
-    it "prefers inline data over a path" do
-      resource = {
-        'path' => test_package_filename('test.csv'),
+    it 'returns the data' do
+      resource_hash = {
+        'foo' => 'bar',
         'data' => 'whevs'
       }
 
-      expect(DataPackage::Resource.load(resource)).to be_a_kind_of(DataPackage::InlineResource)
+      resource = DataPackage::Resource.new(resource_hash)
+      expect(resource.data).to eq('whevs')
     end
 
-    it "prefers local data over remote data" do
-      resource = {
-        'path' => test_package_filename('test.csv'),
-        'url' => 'http://example.com/test.csv'
-      }
+  end
 
-      expect(DataPackage::Resource.load(resource)).to be_a_kind_of(DataPackage::LocalResource)
-    end
+  it "raises if the resource doesn't have 'path' or 'data' " do
+    resource_hash = {
+      'foo' => 'bar'
+    }
 
-    it "returns a remote resource if local data doesn't exist" do
-      resource = {
-        'path' => test_package_filename('fake-file.csv'),
-        'url' => 'http://example.com/test.csv'
-      }
-
-      expect(DataPackage::Resource.load(resource)).to be_a_kind_of(DataPackage::RemoteResource)
-    end
-
-    it "prefers inline data over a url" do
-      resource = {
-        'url' => 'http://example.com/test.csv',
-        'data' => 'whevs'
-      }
-
-      expect(DataPackage::Resource.load(resource)).to be_a_kind_of(DataPackage::InlineResource)
-    end
-
+    expect{ DataPackage::Resource.new(resource_hash) }.to raise_error(DataPackage::ResourceError)
   end
 
 end

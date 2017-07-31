@@ -1,5 +1,7 @@
 module DataPackage
-  class RegistryError < StandardError; end
+  class Exception < ::Exception; end
+  class RegistryError < Exception; end
+  class ResourceError < Exception; end
 
   class SchemaException < Exception
     attr_reader :status, :message
@@ -9,5 +11,6 @@ module DataPackage
       @message = status
     end
   end
+
 
 end

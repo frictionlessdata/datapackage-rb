@@ -3,9 +3,9 @@ module DataPackage
     include DataPackage::Helpers
     attr_reader :schema
 
-    def initialize(schema, options = {})
+    def initialize(descriptor, options = {})
       @registry_url = options[:registry_url]
-      @schema = get_schema(schema)
+      @schema = get_schema(descriptor)
       self.merge!(@schema)
     rescue OpenURI::HTTPError, SocketError => e
       raise SchemaException.new "Schema URL returned #{e.message}"
@@ -25,23 +25,23 @@ module DataPackage
 
     private
 
-    def get_schema(schema_reference)
-      if schema_reference.class == Hash
-        schema_reference
+    def get_schema(descriptor)
+      if descriptor.class == Hash
+        descriptor
       else
         begin
-          resolve_reference(schema_reference)
+          resolve_json_reference(descriptor)
         rescue Errno::ENOENT
-          get_schema_from_registry(schema_reference)
+          get_schema_from_registry(descriptor)
         end
       end
     end
 
-    def get_schema_from_registry(schema_reference)
+    def get_schema_from_registry(descriptor)
       registry = DataPackage::Registry.new(@registry_url)
-      schema = registry.get(schema_reference)
+      schema = registry.get(descriptor)
       if schema.nil?
-        raise SchemaException.new "Couldn't find registry entry by reference `#{schema_reference}`"
+        raise SchemaException.new "Couldn't find registry entry by reference `#{descriptor}`"
       end
       schema
     end
