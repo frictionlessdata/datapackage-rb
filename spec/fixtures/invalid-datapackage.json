@@ -1,13 +1,11 @@
 {
     "title": "Test Package",
     "description": "Description",
-    "homepage": {
-      "path": "http://example.org"
-    },
+    "homepage": "http://example.org",
     "last_modified": "2013-12-05",
     "licenses": [{
         "id": "odc-pddl",
-        "url": "http://opendatacommons.org/licenses/pddl/1.0/"
+        "path": "http://opendatacommons.org/licenses/pddl/1.0/"
         }
     ],
     "datapackage_version": "1.0-beta.5",
