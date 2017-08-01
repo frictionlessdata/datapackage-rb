@@ -17,7 +17,7 @@ module DataPackage
     end
 
     def table
-      @table ||= JsonTableSchema::Table.new(CSV.parse(data), self['schema']) if self['schema']
+      @table ||= TableSchema::Table.new(CSV.parse(data), self['schema']) if self['schema']
     end
 
   end

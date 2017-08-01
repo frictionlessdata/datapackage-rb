@@ -6,7 +6,7 @@ describe DataPackage::Helpers do
 
   context 'dereference_descriptor' do
     it 'doesn\'t change non-referencial values' do
-      hash = {'string': 'string', 'integer': 6}
+      hash = {'string'=> 'string', 'integer'=> 6}
 
       expect(dereference_descriptor(hash)).to eq(hash)
     end
