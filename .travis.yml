@@ -5,6 +5,8 @@ before_install:
   - gem update bundler
   - gem install rubygems-update
   - update_rubygems
+install:
+  - bundle install --full-index
 deploy:
   provider: rubygems
   api_key:

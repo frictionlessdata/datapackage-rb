@@ -14,14 +14,14 @@ Gem::Specification.new do |s|
   s.executables           << 'datapackage'
   s.executables           << 'console'
   s.license               = 'MIT'
-  s.required_ruby_version = '>= 2.0'
+  s.required_ruby_version = '>= 2.0', '<2.4'
 
   s.add_dependency 'json', '~> 1.8.3'
   s.add_dependency 'json-schema'
   s.add_dependency 'colorize'
   s.add_dependency 'rubyzip'
   s.add_dependency 'ruby_dig'
-  s.add_dependency 'jsontableschema'
+  s.add_dependency 'tableschema'
 
   s.add_development_dependency 'bundler', '~> 1.3'
   s.add_development_dependency 'rake'

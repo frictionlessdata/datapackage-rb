@@ -249,7 +249,7 @@ describe DataPackage::Package do
 
       it "returns a table" do
         package = DataPackage::Package.new( test_package_filename )
-        expect(package.resources[0].table.class).to eq(JsonTableSchema::Table)
+        expect(package.resources[0].table.class).to eq(TableSchema::Table)
       end
 
       it "returns data in tabular form" do

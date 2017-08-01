@@ -6,7 +6,7 @@ require 'json'
 require 'json-schema'
 require 'zip'
 require 'ruby_dig'
-require 'jsontableschema'
+require 'tableschema'
 
 require 'datapackage/helpers'
 require 'datapackage/version'
