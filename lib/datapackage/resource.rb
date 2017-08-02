@@ -1,6 +1,7 @@
 module DataPackage
   class Resource < Hash
     include DataPackage::Helpers
+
     attr_reader :data
 
     def initialize(resource, base_path = '')
@@ -11,7 +12,7 @@ module DataPackage
       elsif resource.fetch('path', nil)
         @data = open(join_paths(base_path, resource['path'])).read
       else
-        raise ResourceError.new 'A resource descriptor must have a `path` or `data` property.'
+        raise ResourceException.new 'A resource descriptor must have a `path` or `data` property.'
       end
       self.merge! resource
     end

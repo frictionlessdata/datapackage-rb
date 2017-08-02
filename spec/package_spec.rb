@@ -16,18 +16,28 @@ describe DataPackage::Package do
         expect(package).to eq({"name" => "My awesome datapackage"})
       end
 
-      it "uses the base schema by default" do
-        package = DataPackage::Package.new
+      context "profile" do
 
-        expect(package.instance_variable_get("@schema")['title']).to eq('Data Package')
-      end
+        it "uses the base profile by default" do
+          package = DataPackage::Package.new
 
-      it "allows a schema to be specified" do
-        schema = {'foo' => 'bar'}
+          expect(package.profile).to be_a(DataPackage::Profile)
+          expect(package.profile.name).to eq('data-package')
+        end
 
-        package = DataPackage::Package.new(nil, schema: schema)
+        it "allows a custom profile to be specified" do
+          profile_url = 'http://example.org/thing.json'
+          profile_body = File.read File.join('spec', 'fixtures', 'fake_profile.json')
+          FakeWeb.register_uri(:get, profile_url, :body => profile_body)
+          package = DataPackage::Package.new({
+              'profile' => profile_url
+            })
 
-        expect(package.instance_variable_get("@schema")).to eq(schema)
+          expect(package.profile).to eq({
+            'key' => 'value'
+          })
+        end
+
       end
 
       context "allows a resource to be specified" do
@@ -128,7 +138,7 @@ describe DataPackage::Package do
           expect( package.title ).to eql("Test Package")
           expect( package.description ).to eql("Description")
           expect( package.created ).to eq(nil)
-          expect( package.homepage ).to eql({ "path"=> "http://example.org" })
+          expect( package.homepage ).to eql("http://example.org")
           [:sources, :contributors].each do |key|
               expect( package.send(key) ).to eql([])
           end
@@ -173,8 +183,9 @@ describe DataPackage::Package do
       end
 
       it "should load from a zipfile at an explicit URL" do
+          package_body = File.read( File.join( File.dirname(__FILE__), "fixtures", "test-pkg.zip" ) )
           FakeWeb.register_uri(:get, "http://example.com/datapackage.zip",
-              :body => File.read( File.join( File.dirname(__FILE__), "fixtures", "test-pkg.zip" ) ) )
+            :body => package_body)
           package = DataPackage::Package.new( "http://example.com/datapackage.zip" )
           expect( package.name ).to eql("test-package")
           expect( package.resources.length ).to eql(1)
@@ -293,14 +304,18 @@ describe DataPackage::Package do
       end
 
       it "should validate on the fly" do
-        schema = {
+        profile_body = {
             'properties' => {
                 'name' => {}
             },
             'required' => ['name']
         }
+        profile_url = 'http://example.org/my_profile.json'
+        FakeWeb.register_uri(:get, profile_url, :body => JSON.dump(profile_body))
 
-        package = DataPackage::Package.new({}, schema: schema)
+        package = DataPackage::Package.new({
+            'profile' =>  profile_url
+        })
         expect(package.valid?).to eq(false)
 
         package.name = 'A name'

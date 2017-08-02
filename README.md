@@ -115,6 +115,10 @@ end
 
 ## Validating a Data Package
 
+Data Package descriptors can be validated against a [JSON schema](https://tools.ietf.org/html/draft-zyp-json-schema-04) that we call `profile`.
+
+By default, the gem uses the standard [Data Package profile](http://specs.frictionlessdata.io/schemas/data-package.json), but alternative profiles are available.
+
 ```ruby
 package = DataPackage::Package.new('http://data.okfn.org/data/core/gdp/datapackage.json')
 
@@ -124,24 +128,32 @@ package.errors
 #=> [] # An array of errors
 ```
 
-## Using a different schema
+## Using a different profile
 
-By default, the gem uses the standard [Data Package Schema](http://specs.frictionlessdata.io/data-packages/), but alternative schemas are available.
+According to the [specs](https://specs.frictionlessdata.io/profiles/) the value of
+the `profile` property can be either a URL or an indentifier from [the registry](https://specs.frictionlessdata.io/schemas/registry.json).
 
-### Schemas in the local cache
+### Profiles in the local cache
 
-The gem comes with schemas for the standard Data Package Schema, as well as the [Tabular Data Package Schema](http://specs.frictionlessdata.io/tabular-data-package/), and the [Fiscal Data Package Schema](http://fiscal.dataprotocols.org/spec/). These can be referred to via an identifier, expressed as a symbol.
+The profiles from the registry come bundled with the gem. You can reference them in your DataPackage descriptor by their identifier in [the registry](https://specs.frictionlessdata.io/schemas/registry.json):
+
+    - `tabular-data-package` for a [Tabular Data Package](http://specs.frictionlessdata.io/tabular-data-package/)
+    - `fiscal-data-package` for a [Fiscal Data Package](http://fiscal.dataprotocols.org/spec/)
 
 ```ruby
-package = DataPackage::Package.new(nil, schema: 'tabular-data-package') # Or 'fiscal-data-package'
+{
+  "profile": "tabular-data-package" #or "fiscal-data-package"
+}
 ```
 
-### Schemas from elsewhere
+### Profiles from elsewhere
 
-If you have a schema stored in an alternative registry, you can pass a `registry_url` option to the initializer.
+If you have a custom profile schema you can reference it by its URL
 
 ```ruby
-package = DataPackage::Package.new(nil, schema: 'profile-id', {registry_url: 'http://example.org/my-registry.csv'} )
+{
+  "profile": "https://specs.frictionlessdata.io/schemas/tabular-data-package.json"
+}
 ```
 
 ## Developer notes

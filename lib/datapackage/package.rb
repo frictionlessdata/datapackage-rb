@@ -4,20 +4,18 @@ module DataPackage
   class Package < Hash
     include DataPackage::Helpers
 
-    attr_reader :opts, :errors
+    attr_reader :opts, :errors, :profile
     attr_writer :resources
 
     # Parse or create a data package
     # Supports reading data from JSON file, directory, and a URL
-      # descriptor:: Hash or String
-      # schema:: Hash or String
-      # opts:: Options used to customize reading and parsing
-    def initialize(descriptor = nil, schema: 'data-package', opts: {})
+    # descriptor:: Hash or String
+    # opts:: Options used to customize reading and parsing
+    def initialize(descriptor = nil, opts: {})
       @opts = opts
-      @schema = DataPackage::Schema.new(schema)
       @dead_resources = []
-
       self.merge! parse_package(descriptor)
+      @profile = DataPackage::Profile.new(self.fetch('profile', 'data-package'))
       define_properties!
       load_resources!
     end
@@ -69,8 +67,8 @@ module DataPackage
     end
 
     def validate
-      @errors = @schema.validation_errors(self)
-      @valid = @schema.valid?(self)
+      @errors = @profile.validate(self)
+      @valid = @profile.valid?(self)
     end
 
     def resource_exists?(location)
@@ -84,8 +82,8 @@ module DataPackage
     private
 
     def define_properties!
-      (@schema['properties'] || {}).each do |k, v|
-        next if k == 'resources'
+      (@profile['properties'] || {}).each do |k, v|
+        next if k == 'resources' || k == 'profile'
         define_singleton_method("#{k.to_sym}=", proc { |p| set_property(k, p) })
         define_singleton_method(k.to_sym.to_s, proc { property k, default_value(v) })
       end
@@ -100,7 +98,7 @@ module DataPackage
       @resources.map! do |resource|
         begin
           load_resource(resource)
-        rescue ResourceError
+        rescue ResourceException
           @dead_resources << resource['path']
           nil
         end
@@ -115,8 +113,8 @@ module DataPackage
       end
     end
 
-    def default_value(schema_data)
-      case schema_data['type']
+    def default_value(profile_data)
+      case profile_data['type']
       when 'string'
           nil
       when 'array'

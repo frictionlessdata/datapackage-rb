@@ -80,5 +80,19 @@ module DataPackage
       end
     end
 
+    def is_fully_qualified_url?(string)
+      uri = URI.parse(string)
+      uri.is_a?(URI::HTTP) && !uri.host.nil?
+    rescue URI::InvalidURIError
+      false
+    end
+
+    def is_safe_path?(string)
+      path = Pathname.new(string)
+      return false if path.absolute?
+      return false unless /^\.+$/.match(path.split[0].to_s).nil?
+      true
+    end
+
   end
 end

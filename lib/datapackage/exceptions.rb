@@ -1,14 +1,6 @@
 module DataPackage
   class Exception < ::Exception; end
-  class RegistryError < Exception; end
-  class ResourceError < Exception; end
-
-  class SchemaException < Exception
-    attr_reader :status, :message
-
-    def initialize status
-      @status = status
-      @message = status
-    end
-  end
+  class RegistryException < Exception; end
+  class ResourceException < Exception; end
+  class ProfileException < Exception; end
 end
