@@ -29,6 +29,7 @@ describe DataPackage::Helpers do
 
     it 'dereferences paths' do
       filepath = File.join( File.dirname(__FILE__), 'fixtures', 'base_profile.json' )
+
       expect(dereference_descriptor(filepath)).to eq({
         'title'=> 'base_profile'
       })
@@ -37,6 +38,7 @@ describe DataPackage::Helpers do
     it 'dereferences paths with base_path' do
       filename = 'base_profile.json'
       base_path = File.join( File.dirname(__FILE__), 'fixtures')
+
       expect(dereference_descriptor(filename, base_path: base_path)).to eq({
         'title'=> 'base_profile'
       })
@@ -52,6 +54,7 @@ describe DataPackage::Helpers do
           }
         ]
       }
+
       expect(dereference_descriptor(descriptor, base_path: base_path)).to eq({
         'resources' => [
           {
@@ -68,14 +71,14 @@ describe DataPackage::Helpers do
       random_url = 'http://example.org/random.json'
       schema_body = {'fields'=> [{'name'=>'Price', 'title'=>'Price', 'type'=>'integer'}]}
       random_body = {'field_name'=> 3}
-
-      FakeWeb.register_uri(:get, schema_url, :body => JSON.dump(schema_body))
-      FakeWeb.register_uri(:get, random_url, :body => JSON.dump(random_body))
-
       descriptor = {
         'schema'=> schema_url,
         'random'=> random_url,
       }
+
+      FakeWeb.register_uri(:get, schema_url, :body => JSON.dump(schema_body))
+      FakeWeb.register_uri(:get, random_url, :body => JSON.dump(random_body))
+
       expect(dereference_descriptor(descriptor, reference_fields: ['schema'])).to eq({
         'schema'=> {
           'fields' => [{'name'=>'Price', 'title'=>'Price', 'type'=>'integer'}]
@@ -85,4 +88,21 @@ describe DataPackage::Helpers do
     end
 
   end
+
+  context 'is_fully_qualified_url' do
+
+    it 'is true for a fully qualified HTTP/HTTPS URL' do
+      expect(is_fully_qualified_url?('http://example.org/schema.json')).to be true
+    end
+
+    it 'is false for non-URI strings' do
+      expect(is_fully_qualified_url?('def not an URI')).to be false
+    end
+
+    it 'is false for URI strings if they are not HTTP(S)' do
+      expect(is_fully_qualified_url?('ftp://example.org/schema.json')).to be false
+    end
+
+  end
+
 end

@@ -110,7 +110,7 @@ describe DataPackage::Resource do
       'foo' => 'bar'
     }
 
-    expect{ DataPackage::Resource.new(resource_hash) }.to raise_error(DataPackage::ResourceError)
+    expect{ DataPackage::Resource.new(resource_hash) }.to raise_error(DataPackage::ResourceException)
   end
 
 end
