@@ -129,13 +129,13 @@ module DataPackage
     end
 
     def read_package(descriptor)
-      default_filename = @opts[:default_filename] || 'datapackage.json'
-      descriptor = join_paths(descriptor, default_filename)
-      @location = descriptor.to_s
-      if File.extname(descriptor.to_s) == '.zip'
-          unzip_package(descriptor)
+      if File.extname(descriptor) == '.zip'
+        unzip_package(descriptor)
       else
-          load_json(descriptor)
+        default_filename = @opts[:default_filename] || 'datapackage.json'
+        descriptor = join_paths(descriptor, default_filename)
+        @location = descriptor.to_s
+        load_json(descriptor)
       end
     end
 
