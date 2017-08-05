@@ -1,116 +1,216 @@
 describe DataPackage::Resource do
 
-  context 'remote resource' do
-
-    before(:each) do
-      @url = 'http://example.com/test.csv'
-      FakeWeb.register_uri(:get, @url,
-          :body => File.read( test_package_filename('test.csv') ) )
-    end
-
-    it 'returns the resource' do
-      resource_hash = {
-        'foo' => 'bar',
-        'path' => @url
-      }
-
-      resource = DataPackage::Resource.new(resource_hash)
-
-      expect(resource).to eq(resource_hash)
-    end
-
-    it 'loads the data from a url' do
-      resource_hash = {
-        'foo' => 'bar',
-        'path' => @url
-      }
-
-      resource = DataPackage::Resource.new(resource_hash)
-      expect(resource.data).to eq(File.read(test_package_filename('test.csv')))
-    end
-
-    it 'loads the data with a base url' do
-      resource_hash = {
-        'foo' => 'bar',
-        'path' => 'test.csv'
-      }
-
-      base_url = 'http://example.com/'
-
-      resource = DataPackage::Resource.new(resource_hash, base_url)
-      expect(resource.data).to eq(File.read(test_package_filename('test.csv')))
-    end
-
-  end
-
-  context 'local resource' do
-
-    it 'returns the resource' do
-      resource_hash = {
-        'foo' => 'bar',
-        'path' => test_package_filename('test.csv')
-      }
-
-      resource = DataPackage::Resource.new(resource_hash)
-
-      expect(resource).to eq(resource_hash)
-    end
-
-    it 'loads the data lazily' do
-      resource_hash = {
-        'foo' => 'bar',
-        'path' => test_package_filename('test.csv')
-      }
-
-      resource = DataPackage::Resource.new(resource_hash)
-      expect(resource.data).to eq(File.read(test_package_filename('test.csv')))
-    end
-
-    it 'loads the data with a base path' do
-      resource_hash = {
-        'foo' => 'bar',
-        'path' => 'test.csv'
-      }
-
-      base_path = File.join( File.dirname(__FILE__), "fixtures", "test-pkg" )
-
-      resource = DataPackage::Resource.new(resource_hash, base_path)
-      expect(resource.data).to eq(File.read(test_package_filename('test.csv')))
-    end
-
-  end
-
-  context 'inline resource' do
-
-    it 'returns the resource' do
-      resource_hash = {
-        'foo' => 'bar',
-        'data' => 'whevs'
-      }
-
-      resource = DataPackage::Resource.new(resource_hash)
-
-      expect(resource).to eq(resource_hash)
-    end
-
-    it 'returns the data' do
-      resource_hash = {
-        'foo' => 'bar',
-        'data' => 'whevs'
-      }
-
-      resource = DataPackage::Resource.new(resource_hash)
-      expect(resource.data).to eq('whevs')
-    end
-
-  end
-
-  it "raises if the resource doesn't have 'path' or 'data' " do
-    resource_hash = {
-      'foo' => 'bar'
+  let(:tabular_resource) {
+    {
+      'name'=> 'tabular_resource',
+      'data'=> [['first', 'second'], [1,2]],
+      'schema'=> {
+        'fields'=> [
+          {
+            'name'=> 'first',
+            'type'=> 'integer',
+          },
+          {
+            'name'=> 'second',
+            'type'=> 'integer',
+          }
+        ]
+      },
+      'profile'=> 'tabular-data-resource',
     }
+  }
 
-    expect{ DataPackage::Resource.new(resource_hash) }.to raise_error(DataPackage::ResourceException)
+  context 'initialize' do
+
+    it "raises if the resource doesn't have 'path' or 'data' " do
+      resource_hash = {
+        'foo'=> 'bar'
+      }
+
+      expect{ DataPackage::Resource.new(resource_hash) }.to raise_error(DataPackage::ResourceException)
+    end
+
+    it 'returns the resource' do
+      resource_hash = {
+        'name'=> 'resource',
+        'data'=> 'whevs'
+      }
+      resource = DataPackage::Resource.new(resource_hash)
+
+      expect(resource).to eq(resource_hash)
+    end
+
+    context 'remote resource' do
+
+      before(:each) do
+        @url = 'http://example.com/test.csv'
+        FakeWeb.register_uri(:get, @url,
+            :body => File.read( test_package_filename('test.csv') ) )
+      end
+
+      it 'correctly detects source_type' do
+        resource_hash = {
+          'name' => 'remote resource',
+          'path' => @url
+        }
+        resource = DataPackage::Resource.new(resource_hash)
+
+        expect(resource.source_type).to eq('remote')
+      end
+
+      it 'accepts full URL as source' do
+        resource_hash = {
+          'name' => 'remote resource',
+          'path' => @url
+        }
+        resource = DataPackage::Resource.new(resource_hash)
+
+        expect(resource.source).to eq(@url)
+      end
+
+      it 'constructs source from a base URL' do
+        file = 'test.csv'
+        resource_hash = {
+          'name' => 'remote resource',
+          'path' => file,
+        }
+        base_url = 'http://example.com/'
+        resource = DataPackage::Resource.new(resource_hash, base_url)
+
+        expect(resource.source).to eq(URI.join(base_url, file).to_s)
+      end
+
+    end
+
+    context 'local resource' do
+
+      before(:each) do
+        @base_path =  File.dirname(test_package_filename)
+      end
+
+      it 'correctly detects source_type' do
+        resource_hash = {
+          'name' => 'local resource',
+          'path' => 'test.csv'
+        }
+        resource = DataPackage::Resource.new(resource_hash, @base_path)
+
+        expect(resource.source_type).to eq('local')
+      end
+
+      it 'constructs source from a base path' do
+        file = 'test.csv'
+        resource_hash = {
+          'name' => 'local resource',
+          'path' => file,
+        }
+        resource = DataPackage::Resource.new(resource_hash, @base_path)
+
+        expect(resource.source).to eq(File.join(@base_path, file).to_s)
+      end
+
+      it 'raises if absolute path is given' do
+        resource_hash = {
+          'name' => 'local resource',
+          'path' => test_package_filename('test.csv')
+        }
+
+        expect{ DataPackage::Resource.new(resource_hash) }.to raise_error(DataPackage::ResourceException)
+      end
+
+    end
+
+    context 'inline resource' do
+
+      it 'correctly detects source_type' do
+        resource_hash = {
+          'name' => 'inline resource',
+          'data' => 'whevs'
+        }
+        resource = DataPackage::Resource.new(resource_hash)
+
+        expect(resource.source_type).to eq('inline')
+      end
+
+      it 'returns the data' do
+        resource_hash = {
+          'foo' => 'bar',
+          'data' => 'whevs'
+        }
+        resource = DataPackage::Resource.new(resource_hash)
+
+        expect(resource.source).to eq('whevs')
+      end
+
+    end
   end
 
+  context 'validate' do
+
+    it 'should validate basic resource structure' do
+      resource = DataPackage::Resource.new({
+        'name'=> 'resource',
+        'data'=> 'random',
+      })
+      resource.validate
+
+      expect(resource.valid?).to be(true)
+      expect(resource.errors).to eq([])
+    end
+
+    it 'should detect an invalid resource' do
+      schemaless = tabular_resource.reject{|k,v| k.to_s == 'schema'}
+      resource = DataPackage::Resource.new(schemaless)
+
+      expect(resource.valid?).to be(false)
+      expect(resource.errors).to_not be_empty
+    end
+
+  end
+
+  context 'tabular' do
+
+    it 'is true for resources with tabular profile' do
+      resource = DataPackage::Resource.new(tabular_resource)
+
+      expect(resource.tabular?).to be true
+    end
+
+    it 'is true for resources that comply with the tabular profile' do
+      resource = DataPackage::Resource.new(tabular_resource.merge({
+        'profile'=>'data-resource',
+      }))
+
+      expect(resource.tabular?).to be true
+    end
+
+    it 'is false for resources that don\'t comply with tabular profile' do
+      resource = DataPackage::Resource.new({
+        'name'=> 'resource',
+        'data'=> 'random',
+      })
+
+      expect(resource.tabular?).to be false
+    end
+
+  end
+
+  context 'table' do
+
+    it 'returns a table for tabular resources' do
+      resource = DataPackage::Resource.new(tabular_resource)
+
+      expect(DataPackage::Resource.new(tabular_resource).table.class).to eq(TableSchema::Table)
+    end
+
+    it 'returns nil for a non-tabular resources' do
+      resource = DataPackage::Resource.new({
+        'name'=> 'resource',
+        'data'=> 'random',
+      })
+
+      expect(resource.table).to eq(nil)
+    end
+
+  end
 end

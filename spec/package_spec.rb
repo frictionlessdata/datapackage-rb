@@ -43,32 +43,26 @@ describe DataPackage::Package do
       context "allows a resource to be specified" do
 
         it "with a file" do
-          file = test_package_filename('test.csv')
-
-          package = DataPackage::Package.new
-
+          file = 'test.csv'
+          package = DataPackage::Package.new( test_package_filename )
           package.resources << {
             'path' => file
           }
 
           expect(package.resources[0]).to be_a_kind_of(DataPackage::Resource)
-          expect(package.resources[0].data).to eq(File.read(file))
+          expect(package.resources[0].source).to eq(File.join(package.base, file))
         end
 
         it "with a url" do
-          file = test_package_filename('test.csv')
           url = 'http://example.com/test.csv'
-
-          FakeWeb.register_uri(:get, url, :body => File.read( file ) )
-
+          FakeWeb.register_uri(:get, url, body: '')
           package = DataPackage::Package.new
-
           package.resources << {
             'path' => url
           }
 
           expect(package.resources[0]).to be_a_kind_of(DataPackage::Resource)
-          expect(package.resources[0].data).to eq(File.read(file))
+          expect(package.resources[0].source).to eq(url)
         end
 
         it "with inline data" do
@@ -82,7 +76,7 @@ describe DataPackage::Package do
           }
 
           expect(package.resources[0]).to be_a_kind_of(DataPackage::Resource)
-          expect(package.resources[0].data).to eq(data)
+          expect(package.resources[0].source).to eq(data)
         end
 
       end
@@ -95,7 +89,7 @@ describe DataPackage::Package do
         package = {
             "name" => "test-package",
             "description" => "description",
-            "resources" => [ { "path" => test_package_filename('test.csv') }]
+            "resources" => [ { "data" => "test" }]
         }
         package = DataPackage::Package.new(package)
         expect( package.name ).to eql("test-package")
@@ -176,7 +170,7 @@ describe DataPackage::Package do
           FakeWeb.register_uri(:get, "http://example.com/datapackage.json",
               :body => File.read( test_package_filename ) )
           FakeWeb.register_uri(:get, "http://example.com/test.csv",
-              :body => File.read( test_resource_filename ) )
+              :body => File.read( test_package_filename('test.csv') ) )
           package = DataPackage::Package.new( "http://example.com/datapackage.json" )
           expect( package.name ).to eql("test-package")
           expect( package.resources.length ).to eql(1)
@@ -216,44 +210,6 @@ describe DataPackage::Package do
           expect( package.base ).to eql( "http://example.com" )
       end
 
-      context "parsing resources" do
-
-        it "from a local file" do
-          package = DataPackage::Package.new( test_package_filename )
-
-          expect(package.resources[0].data).to eq(File.read(  File.join( File.dirname(__FILE__), "fixtures", "test-pkg", "test.csv") ))
-        end
-
-        it "from a local file with a relative path" do
-          filename = File.join( File.dirname(__FILE__), 'fixtures', 'datapackage_with_foo.txt_resource.json' )
-          package = DataPackage::Package.new(filename)
-
-          expect(package.resources[0]).to be_a_kind_of(DataPackage::Resource)
-          expect(package.resources[0].data).to eq("bar\n")
-        end
-
-        it "from a url" do
-          FakeWeb.register_uri(:get, "http://example.com/datapackage.json",
-              :body => File.read( test_package_filename ) )
-
-          FakeWeb.register_uri(:get, "http://example.com/test.csv",
-              :body => File.read( test_package_filename('test.csv') ) )
-
-          package = DataPackage::Package.new( "http://example.com/datapackage.json" )
-
-          expect(package.resources[0].data).to eq(File.read(  File.join( File.dirname(__FILE__), "fixtures", "test-pkg", "test.csv") ))
-        end
-
-        it "from a zipfile" do
-          path = File.join( File.dirname(__FILE__), "fixtures", "test-pkg.zip" )
-
-          package = DataPackage::Package.new( path )
-
-          expect(package.resources[0].data).to eq(File.read(  File.join( File.dirname(__FILE__), "fixtures", "test-pkg", "test.csv") ))
-        end
-
-      end
-
     end
 
     context "tabular datapackages" do
@@ -288,12 +244,6 @@ describe DataPackage::Package do
         package = DataPackage::Package.new(test_package_filename)
         package.validate
 
-        expect(package.valid?).to be(true)
-        expect(package.errors).to eq([])
-      end
-
-      it "should set errors when valid? is passed" do
-        package = DataPackage::Package.new(test_package_filename)
         expect(package.valid?).to be(true)
         expect(package.errors).to eq([])
       end

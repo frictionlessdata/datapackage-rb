@@ -15,7 +15,3 @@ end
 def test_package_filename(filename="valid-datapackage.json")
   File.join( File.dirname(__FILE__), "fixtures", "test-pkg", filename )
 end
-
-def test_resource_filename(filename="test.csv")
-  File.join( File.dirname(__FILE__), "fixtures", "test-pkg", filename )
-end

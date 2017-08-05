@@ -105,4 +105,19 @@ describe DataPackage::Helpers do
 
   end
 
+  context 'is_safe_path' do
+
+    it 'is true for a relative path' do
+      expect(is_safe_path?('test-pkg/test.csv')).to be true
+    end
+
+    it 'is false for an absolute path' do
+      expect(is_safe_path?('/test.csv')).to be false
+    end
+
+    it 'is false for a parent relative path' do
+      expect(is_safe_path?('../fixtures/test-pkg/test.csv')).to be false
+    end
+  end
+
 end
