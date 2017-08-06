@@ -46,6 +46,7 @@ describe DataPackage::Package do
           file = 'test.csv'
           package = DataPackage::Package.new( test_package_filename )
           package.resources << {
+            'name' => 'resource',
             'path' => file
           }
 
@@ -58,6 +59,7 @@ describe DataPackage::Package do
           FakeWeb.register_uri(:get, url, body: '')
           package = DataPackage::Package.new
           package.resources << {
+            'name' => 'resource',
             'path' => url
           }
 
@@ -72,6 +74,7 @@ describe DataPackage::Package do
           ]
 
           package.resources << {
+            'name' => 'resource',
             'data' => data
           }
 
@@ -89,7 +92,7 @@ describe DataPackage::Package do
         package = {
             "name" => "test-package",
             "description" => "description",
-            "resources" => [ { "data" => "test" }]
+            "resources" => [ { "name" => "resource", "data" => "test" }]
         }
         package = DataPackage::Package.new(package)
         expect( package.name ).to eql("test-package")
@@ -219,7 +222,7 @@ describe DataPackage::Package do
         expect(package.resources[0].table.class).to eq(TableSchema::Table)
       end
 
-      it "returns data in tabular form" do
+      it "table contains data in tabular form" do
         package = DataPackage::Package.new( test_package_filename )
         data = package.resources[0].table.rows(keyed: true)
         expect(data).to eq([
@@ -229,7 +232,7 @@ describe DataPackage::Package do
         ])
       end
 
-      it 'returns nil for non-tabular packages' do
+      it 'table returns nil for non-tabular packages' do
         filename = File.join( File.dirname(__FILE__), 'fixtures', 'datapackage_with_foo.txt_resource.json' )
         package = DataPackage::Package.new( filename )
 

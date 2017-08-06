@@ -9,7 +9,7 @@ module DataPackage
         reference_fields: ['schema', 'dialect'])
       apply_defaults!
       @profile = DataPackage::Profile.new(self['profile'])
-      @name = self['name']
+      @name = self.fetch('name')
       get_source!(base_path)
       apply_table_defaults! if self.tabular?
     end
@@ -35,6 +35,7 @@ module DataPackage
     def validate
       @errors = @profile.validate(self)
       @valid = @profile.valid?(self)
+      @errors
     end
 
     private
