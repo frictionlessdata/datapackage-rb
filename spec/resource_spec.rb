@@ -3,20 +3,19 @@ describe DataPackage::Resource do
   let(:tabular_resource) {
     {
       'name'=> 'tabular_resource',
-      'data'=> [['first', 'second'], [1,2]],
+      'data'=> [['str', 'int'], [1,2]],
       'schema'=> {
         'fields'=> [
           {
-            'name'=> 'first',
-            'type'=> 'integer',
+            'name'=> 'str',
           },
           {
-            'name'=> 'second',
+            'name'=> 'int',
             'type'=> 'integer',
           }
         ]
       },
-      'profile'=> 'tabular-data-resource',
+      'profile'=> DataPackage::DEFAULTS[:resource][:tabular_profile],
     }
   }
 
@@ -30,14 +29,26 @@ describe DataPackage::Resource do
       expect{ DataPackage::Resource.new(resource_hash) }.to raise_error(DataPackage::ResourceException)
     end
 
-    it 'returns the resource' do
+    it 'extends the resource with defaults' do
       resource_hash = {
         'name'=> 'resource',
-        'data'=> 'whevs'
+        'data'=> 'whevs',
       }
+      expected_resource = resource_hash.merge!({
+        'profile'=> DataPackage::DEFAULTS[:resource][:profile],
+        'encoding'=> DataPackage::DEFAULTS[:resource][:encoding],
+      })
       resource = DataPackage::Resource.new(resource_hash)
 
-      expect(resource).to eq(resource_hash)
+      expect(resource).to eq(expected_resource)
+    end
+
+    it 'extends a tabular resource with table defaults' do
+      resource = DataPackage::Resource.new(tabular_resource)
+
+      expect(resource['schema']['missingValues']).to eq(DataPackage::DEFAULTS[:schema][:missing_values])
+      expect(resource['schema']['fields'][0]['type']).to eq(DataPackage::DEFAULTS[:schema][:type])
+      expect(resource['schema']['fields'][0]['format']).to eq(DataPackage::DEFAULTS[:schema][:format])
     end
 
     context 'remote resource' do
@@ -178,7 +189,7 @@ describe DataPackage::Resource do
 
     it 'is true for resources that comply with the tabular profile' do
       resource = DataPackage::Resource.new(tabular_resource.merge({
-        'profile'=>'data-resource',
+        'profile'=> DataPackage::DEFAULTS[:resource][:profile],
       }))
 
       expect(resource.tabular?).to be true
