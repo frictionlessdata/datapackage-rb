@@ -23,7 +23,8 @@ describe DataPackage::Resource do
 
     it "raises if the resource doesn't have 'path' or 'data' " do
       resource_hash = {
-        'foo'=> 'bar'
+        'name'=> 'resource',
+        'foo'=> 'bar',
       }
 
       expect{ DataPackage::Resource.new(resource_hash) }.to raise_error(DataPackage::ResourceException)
@@ -145,7 +146,7 @@ describe DataPackage::Resource do
 
       it 'returns the data' do
         resource_hash = {
-          'foo' => 'bar',
+          'name' => 'bar',
           'data' => 'whevs'
         }
         resource = DataPackage::Resource.new(resource_hash)

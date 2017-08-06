@@ -2,6 +2,7 @@
   "name": "datapackage",
   "resources": [
     {
+      "name": "bar",
       "path": "foo.txt"
     }
   ]
