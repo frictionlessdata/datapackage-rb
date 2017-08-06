@@ -73,7 +73,7 @@ describe DataPackage::Profile do
 
   end
 
-  context 'validate' do
+  context 'validation' do
 
     before(:each) do
       @profile = DataPackage::Profile.new('data-package')
@@ -81,21 +81,45 @@ describe DataPackage::Profile do
       @invalid_datapackage = JSON.parse(File.read File.join('spec', 'fixtures', 'invalid-datapackage.json'))
     end
 
-    it 'validates correctly' do
-      expect(@profile.valid?(@valid_datapackage)).to be true
+    context 'validate' do
+
+      it 'if true for valid package' do
+        expect(@profile.validate(@valid_datapackage)).to be true
+      end
+
+      it 'raises ValidationError for invalid package' do
+        expect{ @profile.validate(@invalid_datapackage) }.to raise_error(DataPackage::ValidationError)
+      end
+
     end
 
-    it 'returns errors' do
-      expect(@profile.valid?(@invalid_datapackage)).to be false
+    context 'valid' do
 
-      errors = @profile.validate(@invalid_datapackage)
-      expect(errors.count).to eq(1)
+      it 'is true for valid package' do
+        expect(@profile.valid?(@valid_datapackage)).to be true
+      end
+
+      it 'is false for invalid package' do
+        expect(@profile.valid?(@invalid_datapackage)).to be false
+      end
+
     end
 
-    it 'retuns no errors if data is valid' do
-      expect(@profile.validate(@valid_datapackage).count).to eq(0)
-    end
+    context 'iter_errors' do
 
+      it 'is empty when the package is valid' do
+        errors = []
+        @profile.iter_errors(@valid_datapackage){ |err| errors << err }
+        expect(errors).to be_empty
+      end
+
+      it 'raises ValidationError for invalid package' do
+        errors = []
+        @profile.iter_errors(@invalid_datapackage){ |err| errors << err }
+        expect(errors).to_not be_empty
+      end
+
+    end
   end
 
 end

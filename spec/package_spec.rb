@@ -245,15 +245,17 @@ describe DataPackage::Package do
 
       it "should validate basic datapackage structure" do
         package = DataPackage::Package.new(test_package_filename)
-        package.validate
 
-        expect(package.valid?).to be(true)
-        expect(package.errors).to eq([])
+        expect(package.valid?).to be true
+        expect(package.validate).to be true
+        expect(package.iter_errors{ |err| err }).to be_empty
       end
 
       it "should detect an invalid datapackage" do
         package = DataPackage::Package.new( { "name" => "this is invalid" } )
-        expect( package.valid? ).to be(false)
+        expect( package.valid? ).to be false
+        expect{ package.validate }.to raise_error(DataPackage::ValidationError)
+        expect(package.iter_errors{ |err| err }).to_not be_empty
       end
 
       it "should validate on the fly" do
@@ -269,10 +271,39 @@ describe DataPackage::Package do
         package = DataPackage::Package.new({
             'profile' =>  profile_url
         })
-        expect(package.valid?).to eq(false)
+        expect(package.valid?).to be false
 
         package.name = 'A name'
-        expect(package.valid?).to eq(true)
+        expect(package.valid?).to be true
+      end
+
+      it 'should fail if resources don\'t validate against their profiles' do
+        profile_body = {
+            'properties' => {
+                'name' => {},
+                'title'=> {},
+            },
+            'required' => ['name', 'title']
+        }
+        profile_url = 'http://example.org/my_profile.json'
+        FakeWeb.register_uri(:get, profile_url, :body => JSON.dump(profile_body))
+        package = DataPackage::Package.new({
+          'name'=> 'package',
+          'profile'=> profile_url,
+          'title'=> 'this resource should have a title',
+          'resources'=> [
+            {
+              'name'=> 'resource_without_title',
+              'profile'=> profile_url,
+              'data'=> 'cmon',
+            }
+          ]
+        })
+
+        expect(package.valid?).to be false
+        expect(package.resources.first.valid?).to be false
+        expect{ package.validate }.to raise_error(DataPackage::ValidationError)
+        expect(package.iter_errors{ |err| err }).to_not be_empty
       end
 
     end

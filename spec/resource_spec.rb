@@ -164,18 +164,19 @@ describe DataPackage::Resource do
         'name'=> 'resource',
         'data'=> 'random',
       })
-      resource.validate
 
-      expect(resource.valid?).to be(true)
-      expect(resource.errors).to eq([])
+      expect(resource.valid?).to be true
+      expect(resource.validate).to be true
+      expect(resource.iter_errors{ |err| err }).to be_empty
     end
 
     it 'should detect an invalid resource' do
       schemaless = tabular_resource.reject{|k,v| k.to_s == 'schema'}
       resource = DataPackage::Resource.new(schemaless)
 
-      expect(resource.valid?).to be(false)
-      expect(resource.errors).to_not be_empty
+      expect(resource.valid?).to be false
+      expect{ resource.validate }.to raise_error(DataPackage::ValidationError)
+      expect(resource.iter_errors{ |err| err }).to_not be_empty
     end
 
   end
