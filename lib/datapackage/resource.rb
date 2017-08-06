@@ -5,12 +5,13 @@ module DataPackage
     attr_reader :name, :profile, :source, :source_type, :valid, :errors
 
     def initialize(resource, base_path = '')
-      resource = dereference_descriptor(resource, base_path: base_path,
+      self.merge! dereference_descriptor(resource, base_path: base_path,
         reference_fields: ['schema', 'dialect'])
-      self.merge! resource
-      @profile = DataPackage::Profile.new(self.fetch('profile', 'data-resource'))
+      apply_defaults!
+      @profile = DataPackage::Profile.new(self['profile'])
       @name = self['name']
       get_source!(base_path)
+      apply_table_defaults! if self.tabular?
     end
 
     def table
@@ -18,7 +19,7 @@ module DataPackage
     end
 
     def tabular?
-      tabular_profile = 'tabular-data-resource'
+      tabular_profile = DataPackage::DEFAULTS[:resource][:tabular_profile]
       return true if @profile.name == tabular_profile
       return true if DataPackage::Profile.new(tabular_profile).valid?(self)
       false
@@ -53,5 +54,25 @@ module DataPackage
       end
     end
 
+    def apply_defaults!
+      self['profile'] ||= DataPackage::DEFAULTS[:resource][:profile]
+      self['encoding'] ||= DataPackage::DEFAULTS[:resource][:encoding]
+    end
+
+    def apply_table_defaults!
+      if self.fetch('schema', nil)
+        self['schema']['missingValues'] = DataPackage::DEFAULTS[:schema][:missing_values]
+        self['schema'].fetch('fields', []).each do |field_descriptor|
+          field_descriptor['type'] ||= DataPackage::DEFAULTS[:schema][:type]
+          field_descriptor['format'] ||= DataPackage::DEFAULTS[:schema][:format]
+        end
+      end
+
+      if self.fetch('dialect', nil)
+        DataPackage::DEFAULTS[:dialect].each do |key, val|
+          self['dialect'][key.to_s] ||= val
+        end
+      end
+    end
   end
 end

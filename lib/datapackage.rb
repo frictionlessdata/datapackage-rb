@@ -8,6 +8,7 @@ require 'zip'
 require 'ruby_dig'
 require 'tableschema'
 
+require 'datapackage/defaults'
 require 'datapackage/helpers'
 require 'datapackage/version'
 require 'datapackage/exceptions'

@@ -15,7 +15,7 @@ module DataPackage
       @opts = opts
       @dead_resources = []
       self.merge! parse_package(descriptor)
-      @profile = DataPackage::Profile.new(self.fetch('profile', 'data-package'))
+      @profile = DataPackage::Profile.new(self.fetch('profile', DataPackage::DEFAULTS[:package][:profile]))
       define_properties!
       load_resources!
     end
@@ -100,7 +100,6 @@ module DataPackage
           load_resource(resource)
         rescue ResourceException
           @dead_resources << resource['path']
-          nil
         end
       end
     end
@@ -113,14 +112,14 @@ module DataPackage
       end
     end
 
-    def default_value(profile_data)
-      case profile_data['type']
-      when 'string'
-          nil
+    def default_value(field_data)
+      case field_data['type']
       when 'array'
           []
       when 'object'
           {}
+      else
+        nil
       end
     end
 
