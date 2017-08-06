@@ -70,9 +70,9 @@ module DataPackage
       if base_path.nil? || base_path.empty?
         resource
       elsif base_path =~ /\A#{URI::regexp}\z/
-        URI.join(base_path, resource)
+        URI.join(base_path, resource).to_s
       elsif File.directory?(base_path)
-        File.join(base_path, resource)
+        File.join(base_path, resource).to_s
       elsif File.file?(base_path)
         base_path
       else
@@ -90,7 +90,7 @@ module DataPackage
     def is_safe_path?(string)
       path = Pathname.new(string)
       return false if path.absolute?
-      return false unless /^\.+$/.match(path.split[0].to_s).nil?
+      return false unless /^\.+$/.match(path.to_s.split('/').first).nil?
       true
     end
 
