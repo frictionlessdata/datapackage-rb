@@ -24,14 +24,23 @@ module DataPackage
       self.to_h
     end
 
-    # Returns true if there are no errors, false if there are
-    def valid?(package)
-      JSON::Validator.validate(self, package)
+    # Returns true if there are no errors in data, false if there are
+    def valid?(data)
+      JSON::Validator.validate(self, data)
     end
 
-    # Returns an array of validation errors
-    def validate(package)
-      JSON::Validator.fully_validate(self, package)
+    alias :valid :valid?
+
+    # Validate data against this profile. Returns true or raises DataPackage::ValidationError
+    def validate(data)
+      JSON::Validator.validate!(self, data)
+    rescue JSON::Schema::ValidationError => e
+      raise DataPackage::ValidationError.new(e.message)
+    end
+
+    # Lazily yields each ValidationError raised for data
+    def iter_errors(data)
+      JSON::Validator.fully_validate(self, data).each{ |error| yield error }
     end
 
     private

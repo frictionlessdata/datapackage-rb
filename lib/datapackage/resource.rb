@@ -2,7 +2,7 @@ module DataPackage
   class Resource < Hash
     include DataPackage::Helpers
 
-    attr_reader :name, :profile, :source, :source_type, :valid, :errors
+    attr_reader :name, :profile, :source, :source_type, :errors
 
     def initialize(resource, base_path = '')
       self.merge! dereference_descriptor(resource, base_path: base_path,
@@ -12,6 +12,10 @@ module DataPackage
       @name = self.fetch('name')
       get_source!(base_path)
       apply_table_defaults! if self.tabular?
+    end
+
+    def descriptor
+      self.to_h
     end
 
     def table
@@ -28,14 +32,15 @@ module DataPackage
     alias :tabular :tabular?
 
     def valid?
-      validate
-      @valid
+      @profile.valid?(self)
     end
 
     def validate
-      @errors = @profile.validate(self)
-      @valid = @profile.valid?(self)
-      @errors
+      @profile.validate(self)
+    end
+
+    def iter_errors
+      @profile.iter_errors(self){ |err| yield err }
     end
 
     private

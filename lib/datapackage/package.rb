@@ -20,15 +20,8 @@ module DataPackage
       load_resources!
     end
 
-    def parse_package(descriptor)
-      # TODO: base directory/url
-      if descriptor.nil?
-        {}
-      elsif descriptor.class == Hash
-        descriptor
-      else
-        read_package(descriptor)
-      end
+    def descriptor
+      self.to_h
     end
 
     # Returns the directory for a local file package or base url for a remote
@@ -62,13 +55,23 @@ module DataPackage
     end
 
     def valid?
-      validate
-      @valid
+      return false unless @profile.valid?(self)
+      return false if @resources.map{ |resource| resource.valid? }.include?(false)
+      true
     end
 
     def validate
-      @errors = @profile.validate(self)
-      @valid = @profile.valid?(self)
+      @profile.validate(self)
+      @resources.each { |resource| resource.validate }
+      true
+    end
+
+    def iter_errors
+      errors = @profile.iter_errors(self){ |err| err }
+      @resources.each do |resource|
+        resource.iter_errors{ |err| errors << err }
+      end
+      errors.each{ |error| yield error }
     end
 
     def resource_exists?(location)
@@ -125,6 +128,17 @@ module DataPackage
 
     def set_property(key, value)
       self[key] = value
+    end
+
+    def parse_package(descriptor)
+      # TODO: base directory/url
+      if descriptor.nil?
+        {}
+      elsif descriptor.class == Hash
+        descriptor
+      else
+        read_package(descriptor)
+      end
     end
 
     def read_package(descriptor)
