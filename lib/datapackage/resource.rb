@@ -14,7 +14,7 @@ module DataPackage
     end
 
     def table
-      TableSchema::Table.new(self.source, self['schema']) if tabular?
+      @table ||= TableSchema::Table.new(self.source, self['schema']) if tabular?
     end
 
     def tabular?
