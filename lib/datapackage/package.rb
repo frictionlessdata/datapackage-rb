@@ -4,7 +4,7 @@ module DataPackage
   class Package < Hash
     include DataPackage::Helpers
 
-    attr_reader :opts, :errors, :profile
+    attr_reader :opts, :errors, :profile, :dead_resources
     attr_writer :resources
 
     # Parse or create a data package
@@ -50,8 +50,9 @@ module DataPackage
       @resources
     end
 
-    def property(property, default = nil)
-      self[property] || default
+    def resource_names
+      update_resources!
+      @resources.map{|res| res.name}
     end
 
     def valid?
@@ -59,6 +60,8 @@ module DataPackage
       return false if @resources.map{ |resource| resource.valid? }.include?(false)
       true
     end
+
+    alias :valid  :valid?
 
     def validate
       @profile.validate(self)
@@ -74,12 +77,36 @@ module DataPackage
       errors.each{ |error| yield error }
     end
 
-    def resource_exists?(location)
-      @dead_resources.include?(location)
+    def add_resource(resource)
+      resource = load_resource(resource)
+      @resources.push(resource)
+      begin
+        self.validate
+        resource
+      rescue DataPackage::ValidationError
+        @resources.pop
+        nil
+      end
     end
 
-    def to_json
-      self.to_json
+    def remove_resource(resource_name)
+      resource = get_resource(resource_name)
+      @resources.reject!{ |resource| resource.name == resource_name }
+      resource
+    end
+
+    def get_resource(resource_name)
+      @resources.find{ |resource| resource.name == resource_name }
+    end
+
+    def save(target=@location)
+      update_resources!
+      File.open(target, "w") { |file| file << JSON.pretty_generate(self) }
+      true
+    end
+
+    def property(property, default = nil)
+      self[property] || default
     end
 
     private
@@ -102,9 +129,10 @@ module DataPackage
         begin
           load_resource(resource)
         rescue ResourceException
-          @dead_resources << resource['path']
+          @dead_resources << resource
+          nil
         end
-      end
+      end.compact!
     end
 
     def load_resource(resource)

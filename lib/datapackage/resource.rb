@@ -35,6 +35,8 @@ module DataPackage
       @profile.valid?(self)
     end
 
+    alias :valid :valid?
+
     def validate
       @profile.validate(self)
     end
