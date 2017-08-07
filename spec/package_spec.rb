@@ -279,11 +279,11 @@ describe DataPackage::Package do
 
       it 'should fail if resources don\'t validate against their profiles' do
         profile_body = {
-            'properties' => {
-                'name' => {},
-                'title'=> {},
-            },
-            'required' => ['name', 'title']
+          'properties' => {
+            'name' => {},
+            'title'=> {},
+          },
+          'required' => ['name', 'title']
         }
         profile_url = 'http://example.org/my_profile.json'
         FakeWeb.register_uri(:get, profile_url, :body => JSON.dump(profile_body))
@@ -308,4 +308,122 @@ describe DataPackage::Package do
 
     end
 
+    context 'add_resource' do
+
+      before(:each) do
+        profile_body = {
+          'properties' => {
+            'name' => {},
+            'resources'=> {
+              'items'=> {
+                'required' => ['name', 'title']
+              }
+            }
+          }
+        }
+        profile_url = 'http://example.org/my_profile.json'
+        FakeWeb.register_uri(:get, profile_url, :body => JSON.dump(profile_body))
+        @package = DataPackage::Package.new({
+          'name'=> 'package',
+          'profile'=> profile_url,
+          'resources'=> []
+        })
+      end
+
+      it 'doesn\'t add a resource that fails package validation' do
+        resource = {
+          'name'=> 'resource_without_title',
+          'data'=> 'cmon',
+        }
+
+        expect(@package.add_resource(resource)).to be_nil
+        expect(@package.resources).to be_empty
+      end
+
+      it 'doesn\'t add a resource that fails resource validation' do
+        resource = {
+          'name'=> 'incorrect_tabular',
+          'data'=> 'cmon',
+          'title'=> 'This has title but it\'s not a valid tabular',
+          'profile'=> 'tabular-data-resource',
+        }
+
+        expect(@package.add_resource(resource)).to be_nil
+        expect(@package.resources).to be_empty
+      end
+
+      it 'adds a valid resource' do
+        resource = {
+          'name'=> 'resource_with_title',
+          'data'=> 'cmon',
+          'title'=> 'This will pass',
+          'encoding'=> DataPackage::DEFAULTS[:resource][:encoding],
+          'profile'=> DataPackage::DEFAULTS[:resource][:profile],
+        }
+
+        expect(@package.add_resource(resource)).to eq(resource)
+        expect(@package.resources).to eq([resource])
+      end
+
+    end
+
+    context 'remove resource' do
+
+      before(:each) do
+        @resource = {
+          'name'=> 'resource',
+          'data'=> 'whevs',
+          'encoding'=> DataPackage::DEFAULTS[:resource][:encoding],
+          'profile'=> DataPackage::DEFAULTS[:resource][:profile],
+        }
+        @package = DataPackage::Package.new({
+          'name'=> 'package',
+          'resources'=> [ @resource ]
+        })
+      end
+
+      it 'removes resource by name' do
+        expect(@package.remove_resource('resource')).to eq(@resource)
+        expect(@package.resources).to be_empty
+      end
+
+      it 'returns nil if resource not found' do
+        expect(@package.remove_resource('inexistent')).to be_nil
+        expect(@package.resources).to_not be_empty
+      end
+
+    end
+
+    context 'save' do
+
+      before(:each) do
+        @content = {
+          'name'=> 'package',
+          'resources'=> []
+        }
+        @buffer = StringIO.new(JSON.dump(@content))
+        @filename = test_package_filename
+        allow(File).to receive(:open).with(@filename,'r').and_yield(@buffer)
+        allow(File).to receive(:open).with(@filename,'w').and_yield(@buffer)
+      end
+
+      it 'updates the package location by default' do
+        package = DataPackage::Package.new(@filename)
+        new_name = 'will_it_save'
+        package['name'] = new_name
+
+        expect(package.save).to be true
+        expect(JSON.load(@buffer.string)['name']).to eq(new_name)
+      end
+
+      it 'updates the file given as target' do
+        package = DataPackage::Package.new(@content)
+        new_name = 'will_it_save'
+        package['name'] = new_name
+
+        expect(package.save(@filename)).to be true
+        expect(JSON.load(@buffer.string)['name']).to eq(new_name)
+      end
+
+    end
 end
