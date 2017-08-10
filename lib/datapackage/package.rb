@@ -18,6 +18,10 @@ module DataPackage
       @profile = DataPackage::Profile.new(self.fetch('profile', DataPackage::DEFAULTS[:package][:profile]))
       define_properties!
       load_resources!
+    rescue OpenURI::HTTPError, SocketError => e
+      raise PackageException.new "Package URL returned #{e.message}"
+    rescue JSON::ParserError
+      raise PackageException.new 'Package descriptor is not valid JSON'
     end
 
     def descriptor
@@ -173,8 +177,6 @@ module DataPackage
       if File.extname(descriptor) == '.zip'
         unzip_package(descriptor)
       else
-        default_filename = @opts[:default_filename] || 'datapackage.json'
-        descriptor = join_paths(descriptor, default_filename)
         @location = descriptor.to_s
         load_json(descriptor)
       end

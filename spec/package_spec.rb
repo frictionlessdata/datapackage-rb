@@ -162,13 +162,6 @@ describe DataPackage::Package do
         expect( package.resources.length ).to eql(1)
       end
 
-      it "should load from a directory" do
-        package = DataPackage::Package.new(File.join( File.dirname(__FILE__), "fixtures", "test-pkg"),
-          opts: {:default_filename=>"valid-datapackage.json"})
-        expect( package.name ).to eql("test-package")
-        expect( package.resources.length ).to eql(1)
-      end
-
       it "should load from an explicit URL" do
           FakeWeb.register_uri(:get, "http://example.com/datapackage.json",
               :body => File.read( test_package_filename ) )
@@ -188,14 +181,6 @@ describe DataPackage::Package do
           expect( package.resources.length ).to eql(1)
       end
 
-      it "should load from a base URL" do
-          FakeWeb.register_uri(:get, "http://example.com/datapackage.json",
-              :body => File.read( test_package_filename ) )
-          package = DataPackage::Package.new( "http://example.com/" )
-          expect( package.name ).to eql("test-package")
-          expect( package.resources.length ).to eql(1)
-      end
-
       it "should distinguish between local and remote packages" do
           package = DataPackage::Package.new( { "name" => "test"} )
           expect( package.local? ).to eql(true)
@@ -208,11 +193,26 @@ describe DataPackage::Package do
 
           FakeWeb.register_uri(:get, "http://example.com/datapackage.json",
               :body => File.read( test_package_filename ) )
-          package = DataPackage::Package.new( "http://example.com/" )
+          package = DataPackage::Package.new( "http://example.com/datapackage.json" )
           expect( package.local? ).to eql(false)
           expect( package.base ).to eql( "http://example.com" )
       end
 
+      it 'raises if URL does not exist' do
+        url = 'http://example.org/datapackage.json'
+        FakeWeb.register_uri(:get, url,
+          :body => "", :status => ["404", "Not Found"] )
+
+          expect { DataPackage::Package.new(url) }.to raise_error(DataPackage::PackageException)
+      end
+
+      it 'raises if the descriptor is not a JSON' do
+        url = 'http://example.org/datapackage.json'
+        body = File.read File.join('spec', 'fixtures', 'not_a_json')
+        FakeWeb.register_uri(:get, url, :body => body)
+
+        expect { DataPackage::Package.new(url) }.to raise_error(DataPackage::PackageException)
+      end
     end
 
     context "tabular datapackages" do
