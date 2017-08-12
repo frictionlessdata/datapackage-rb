@@ -5,7 +5,6 @@ module DataPackage
     include DataPackage::Helpers
 
     attr_reader :opts, :errors, :profile, :dead_resources
-    attr_writer :resources
 
     # Parse or create a data package
     # Supports reading data from JSON file, directory, and a URL
@@ -51,17 +50,17 @@ module DataPackage
 
     def resources
       update_resources!
-      @resources
+      self['resources']
     end
 
     def resource_names
       update_resources!
-      @resources.map{|res| res.name}
+      self['resources'].map{|res| res.name}
     end
 
     def valid?
       return false unless @profile.valid?(self)
-      return false if @resources.map{ |resource| resource.valid? }.include?(false)
+      return false if self['resources'].map{ |resource| resource.valid? }.include?(false)
       true
     end
 
@@ -69,13 +68,13 @@ module DataPackage
 
     def validate
       @profile.validate(self)
-      @resources.each { |resource| resource.validate }
+      self['resources'].each { |resource| resource.validate }
       true
     end
 
     def iter_errors
       errors = @profile.iter_errors(self){ |err| err }
-      @resources.each do |resource|
+      self['resources'].each do |resource|
         resource.iter_errors{ |err| errors << err }
       end
       errors.each{ |error| yield error }
@@ -83,24 +82,26 @@ module DataPackage
 
     def add_resource(resource)
       resource = load_resource(resource)
-      @resources.push(resource)
+      self['resources'].push(resource)
       begin
         self.validate
         resource
       rescue DataPackage::ValidationError
-        @resources.pop
+        self['resources'].pop
         nil
       end
     end
 
     def remove_resource(resource_name)
+      update_resources!
       resource = get_resource(resource_name)
-      @resources.reject!{ |resource| resource.name == resource_name }
+      self['resources'].reject!{ |resource| resource.name == resource_name }
       resource
     end
 
     def get_resource(resource_name)
-      @resources.find{ |resource| resource.name == resource_name }
+      update_resources!
+      self['resources'].find{ |resource| resource.name == resource_name }
     end
 
     def save(target=@location)
@@ -124,12 +125,12 @@ module DataPackage
     end
 
     def load_resources!
-      @resources = (self['resources'] || [])
+      self['resources'] ||= []
       update_resources!
     end
 
     def update_resources!
-      @resources.map! do |resource|
+      self['resources'].map! do |resource|
         begin
           load_resource(resource)
         rescue ResourceException
