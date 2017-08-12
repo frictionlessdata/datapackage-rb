@@ -13,7 +13,6 @@ describe DataPackage::Package do
         package.name = "My awesome datapackage"
 
         expect(package.name).to eq("My awesome datapackage")
-        expect(package).to eq({"name" => "My awesome datapackage"})
       end
 
       context "profile" do
@@ -121,12 +120,6 @@ describe DataPackage::Package do
         package.name = 'new-package'
 
         expect(package.name).to eq('new-package')
-
-        expect(package.to_h).to eq({
-            "name" => "new-package",
-            "description" => "description",
-            "my-property" => "value"
-        })
       end
 
       it "should load from a local file" do
