@@ -15,6 +15,7 @@ module DataPackage
       @dead_resources = []
       self.merge! parse_package(descriptor)
       @profile = DataPackage::Profile.new(self.fetch('profile', DataPackage::DEFAULTS[:package][:profile]))
+      self['profile'] = @profile.name
       define_properties!
       load_resources!
     rescue OpenURI::HTTPError, SocketError => e
