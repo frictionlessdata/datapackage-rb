@@ -91,14 +91,12 @@
         "title": "Contributor",
         "description": "A contributor to this descriptor.",
         "properties": {
-          "name": {
-            "title": "Name",
-            "description": "An identifier string. Lower case characters with `.`, `_`, `-` and `/` are allowed.",
+          "title": {
+            "title": "Title",
+            "description": "A human-readable title.",
             "type": "string",
-            "pattern": "^([-a-z0-9._/])+$",
-            "context": "This is ideally a url-usable and human-readable name. Name `SHOULD` be invariant, meaning it `SHOULD NOT` change when its parent descriptor is updated.",
             "examples": [
-              "{\n  \"name\": \"my-nice-name\"\n}\n"
+              "{\n  \"title\": \"My Package Title\"\n}\n"
             ]
           },
           "path": {
@@ -137,13 +135,13 @@
           }
         },
         "required": [
-          "name"
+          "title"
         ],
         "context": "Use of this property does not imply that the person was the original creator of, or a contributor to, the data in the descriptor, but refers to the composition of the descriptor itself."
       },
       "examples": [
-        "{\n  \"contributors\": [\n    {\n      \"name\": \"Joe Bloggs\"\n    }\n  ]\n}\n",
-        "{\n  \"contributors\": [\n    {\n      \"name\": \"Joe Bloggs\",\n      \"email\": \"joe@example.com\",\n      \"role\": \"author\"\n    }\n  ]\n}\n"
+        "{\n  \"contributors\": [\n    {\n      \"title\": \"Joe Bloggs\"\n    }\n  ]\n}\n",
+        "{\n  \"contributors\": [\n    {\n      \"title\": \"Joe Bloggs\",\n      \"email\": \"joe@example.com\",\n      \"role\": \"author\"\n    }\n  ]\n}\n"
       ]
     },
     "keywords": {
@@ -171,14 +169,10 @@
         "type": "object",
         "properties": {
           "name": {
-            "title": "Name",
-            "description": "An identifier string. Lower case characters with `.`, `_`, `-` and `/` are allowed.",
+            "title": "Open Definition license identifier",
+            "description": "MUST be an Open Definition license identifier, see http://licenses.opendefinition.org/",
             "type": "string",
-            "pattern": "^([-a-z0-9._/])+$",
-            "context": "This is ideally a url-usable and human-readable name. Name `SHOULD` be invariant, meaning it `SHOULD NOT` change when its parent descriptor is updated.",
-            "examples": [
-              "{\n  \"name\": \"my-nice-name\"\n}\n"
-            ]
+            "pattern": "^([-a-zA-Z0-9._])+$"
           },
           "path": {
             "title": "Path",
@@ -216,9 +210,19 @@
         "title": "Data Resource",
         "description": "Data Resource.",
         "type": "object",
-        "required": [
-          "name",
-          "path"
+        "oneOf": [
+          {
+            "required": [
+              "name",
+              "data"
+            ]
+          },
+          {
+            "required": [
+              "name",
+              "path"
+            ]
+          }
         ],
         "properties": {
           "profile": {
@@ -390,14 +394,10 @@
               "type": "object",
               "properties": {
                 "name": {
-                  "title": "Name",
-                  "description": "An identifier string. Lower case characters with `.`, `_`, `-` and `/` are allowed.",
+                  "title": "Open Definition license identifier",
+                  "description": "MUST be an Open Definition license identifier, see http://licenses.opendefinition.org/",
                   "type": "string",
-                  "pattern": "^([-a-z0-9._/])+$",
-                  "context": "This is ideally a url-usable and human-readable name. Name `SHOULD` be invariant, meaning it `SHOULD NOT` change when its parent descriptor is updated.",
-                  "examples": [
-                    "{\n  \"name\": \"my-nice-name\"\n}\n"
-                  ]
+                  "pattern": "^([-a-zA-Z0-9._])+$"
                 },
                 "path": {
                   "title": "Path",
