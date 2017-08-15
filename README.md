@@ -171,9 +171,11 @@ the `profile` property can be either a URL or an indentifier from [the registry]
 
 The profiles from the registry come bundled with the gem. You can reference them in your Data Package descriptor by their identifier in [the registry](https://specs.frictionlessdata.io/schemas/registry.json):
 
+- `data-package` the default profile for a [Data Package](https://specs.frictionlessdata.io/data-package/)
+- `data-resource` the default profile for a [Data Resource](https://specs.frictionlessdata.io/data-resource)
 - `tabular-data-package` for a [Tabular Data Package](http://specs.frictionlessdata.io/tabular-data-package/)
-- `fiscal-data-package` for a [Fiscal Data Package](https://specs.frictionlessdata.io/fiscal-data-package/)
 - `tabular-data-resource` for a [Tabular Data Resource](https://specs.frictionlessdata.io/tabular-data-resource/)
+- `fiscal-data-package` for a [Fiscal Data Package](http://fiscal.dataprotocols.org/spec/)
 
 ```ruby
 {
