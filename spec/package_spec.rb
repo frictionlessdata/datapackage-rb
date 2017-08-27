@@ -217,7 +217,7 @@ describe DataPackage::Package do
 
       it "table contains data in tabular form" do
         package = DataPackage::Package.new( test_package_filename )
-        data = package.resources[0].table.rows(keyed: true)
+        data = package.resources[0].table.read(keyed: true)
         expect(data).to eq([
           {"ID"=>"abc", "Price"=>100},
           {"ID"=>"def", "Price"=>300},
