@@ -1,6 +1,6 @@
 lib = File.expand_path('../lib/', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 $:.unshift lib unless $:.include?(lib)
-
 require 'datapackage/version'
 
 Gem::Specification.new do |s|
@@ -16,7 +16,6 @@ Gem::Specification.new do |s|
   s.license               = 'MIT'
   s.required_ruby_version = '>= 2.0'
 
-  s.add_dependency 'json', '~> 2.1'
   s.add_dependency 'json-schema'
   s.add_dependency 'colorize'
   s.add_dependency 'rubyzip'
