@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
   s.executables           << 'datapackage'
   s.executables           << 'console'
   s.license               = 'MIT'
-  s.required_ruby_version = '>= 2.0', '<2.4'
+  s.required_ruby_version = '>= 2.0'
 
   s.add_dependency 'json', '~> 1.8.3'
   s.add_dependency 'json-schema'
