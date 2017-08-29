@@ -1,4 +1,4 @@
-# DataPackage.rb
+# datapackage-rb
 
 [![Travis](https://travis-ci.org/frictionlessdata/datapackage-rb.svg?branch=master)](https://travis-ci.org/frictionlessdata/datapackage-rb)
 [![Coveralls](http://img.shields.io/coveralls/frictionlessdata/datapackage-rb.svg?branch=master)](https://coveralls.io/r/frictionlessdata/datapackage-rb?branch=master)
@@ -100,7 +100,11 @@ first_resource = package.resources[0]
 first_resource = package.get_resource('example')
 
 # Get info about the data source of this resource
-first_resource.source_type
+first_resource.inline?
+first_resource.local?
+first_resource.remote?
+first_resource.multipart?
+first_resource.tabular?
 first_resource.source
 ```
 
