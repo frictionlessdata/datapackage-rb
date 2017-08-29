@@ -2,7 +2,9 @@ module DataPackage
   class Resource < Hash
     include DataPackage::Helpers
 
-    attr_reader :name, :profile, :source, :source_type, :errors
+    # Public
+
+    attr_reader :errors, :profile, :name, :source
 
     def initialize(resource, base_path = '')
       self.merge! dereference_descriptor(resource, base_path: base_path,
@@ -13,23 +15,6 @@ module DataPackage
       get_source!(base_path)
       apply_table_defaults! if self.tabular?
     end
-
-    def descriptor
-      self.to_h
-    end
-
-    def table
-      @table ||= TableSchema::Table.new(self.source, self['schema']) if tabular?
-    end
-
-    def tabular?
-      tabular_profile = DataPackage::DEFAULTS[:resource][:tabular_profile]
-      return true if @profile.name == tabular_profile
-      return true if DataPackage::Profile.new(tabular_profile).valid?(self)
-      false
-    end
-
-    alias :tabular :tabular?
 
     def valid?
       @profile.valid?(self)
@@ -44,6 +29,49 @@ module DataPackage
     def iter_errors
       @profile.iter_errors(self){ |err| yield err }
     end
+
+    def descriptor
+      self.to_h
+    end
+
+    def inline?
+      @source_type == 'inline'
+    end
+
+    alias :inline :inline?
+
+    def local?
+      @source_type == 'local'
+    end
+
+    alias :local :local?
+
+    def remote?
+      @source_type == 'remote'
+    end
+
+    alias :remote :remote?
+
+    def miltipart?
+      false
+    end
+
+    alias :miltipart :miltipart?
+
+    def tabular?
+      tabular_profile = DataPackage::DEFAULTS[:resource][:tabular_profile]
+      return true if @profile.name == tabular_profile
+      return true if DataPackage::Profile.new(tabular_profile).valid?(self)
+      false
+    end
+
+    alias :tabular :tabular?
+
+    def table
+      @table ||= TableSchema::Table.new(self.source, self['schema']) if tabular?
+    end
+
+    # Private
 
     private
 
@@ -75,12 +103,12 @@ module DataPackage
           field_descriptor['format'] ||= DataPackage::DEFAULTS[:schema][:format]
         end
       end
-
       if self.fetch('dialect', nil)
         DataPackage::DEFAULTS[:dialect].each do |key, val|
           self['dialect'][key.to_s] ||= val
         end
       end
     end
+
   end
 end

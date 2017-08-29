@@ -67,7 +67,7 @@ describe DataPackage::Resource do
         }
         resource = DataPackage::Resource.new(resource_hash)
 
-        expect(resource.source_type).to eq('remote')
+        expect(resource.remote).to eq(true)
       end
 
       it 'accepts full URL as source' do
@@ -107,7 +107,7 @@ describe DataPackage::Resource do
         }
         resource = DataPackage::Resource.new(resource_hash, @base_path)
 
-        expect(resource.source_type).to eq('local')
+        expect(resource.local).to eq(true)
       end
 
       it 'constructs source from a base path' do
@@ -141,7 +141,7 @@ describe DataPackage::Resource do
         }
         resource = DataPackage::Resource.new(resource_hash)
 
-        expect(resource.source_type).to eq('inline')
+        expect(resource.inline).to eq(true)
       end
 
       it 'returns the data' do
@@ -211,8 +211,6 @@ describe DataPackage::Resource do
   context 'table' do
 
     it 'returns a table for tabular resources' do
-      resource = DataPackage::Resource.new(tabular_resource)
-
       expect(DataPackage::Resource.new(tabular_resource).table.class).to eq(TableSchema::Table)
     end
 
