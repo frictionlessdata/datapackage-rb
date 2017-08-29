@@ -4,7 +4,9 @@ module DataPackage
   class Package < Hash
     include DataPackage::Helpers
 
-    attr_reader :opts, :errors, :profile, :dead_resources
+    # Public
+
+    attr_reader :errors, :profile
 
     # Parse or create a data package
     # Supports reading data from JSON file, directory, and a URL
@@ -22,41 +24,6 @@ module DataPackage
       raise PackageException.new "Package URL returned #{e.message}"
     rescue JSON::ParserError
       raise PackageException.new 'Package descriptor is not valid JSON'
-    end
-
-    def descriptor
-      self.to_h
-    end
-
-    # Returns the directory for a local file package or base url for a remote
-    # Returns nil for an in-memory object (because it has no base as yet)
-    def base
-      # user can override base
-      return @opts[:base] if @opts[:base]
-      return '' unless @location
-      # work out base directory or uri
-      if local?
-          return File.dirname(@location)
-      else
-          return @location.split('/')[0..-2].join('/')
-      end
-    end
-
-    # Is this a local package? Returns true if created from an in-memory object or a file/directory reference
-    def local?
-      return @local if @local
-      return false if @location =~ /\A#{URI::regexp}\z/
-      true
-    end
-
-    def resources
-      update_resources!
-      self['resources']
-    end
-
-    def resource_names
-      update_resources!
-      self['resources'].map{|res| res.name}
     end
 
     def valid?
@@ -81,6 +48,25 @@ module DataPackage
       errors.each{ |error| yield error }
     end
 
+    def descriptor
+      self.to_h
+    end
+
+    def resources
+      update_resources!
+      self['resources']
+    end
+
+    def resource_names
+      update_resources!
+      self['resources'].map{|res| res.name}
+    end
+
+    def get_resource(resource_name)
+      update_resources!
+      self['resources'].find{ |resource| resource.name == resource_name }
+    end
+
     def add_resource(resource)
       resource = load_resource(resource)
       self['resources'].push(resource)
@@ -100,20 +86,40 @@ module DataPackage
       resource
     end
 
-    def get_resource(resource_name)
-      update_resources!
-      self['resources'].find{ |resource| resource.name == resource_name }
-    end
-
     def save(target=@location)
       update_resources!
       File.open(target, "w") { |file| file << JSON.pretty_generate(self) }
       true
     end
 
+    # Deprecated
+
+    # Returns the directory for a local file package or base url for a remote
+    # Returns nil for an in-memory object (because it has no base as yet)
+    def base
+      # user can override base
+      return @opts[:base] if @opts[:base]
+      return '' unless @location
+      # work out base directory or uri
+      if local?
+          return File.dirname(@location)
+      else
+          return @location.split('/')[0..-2].join('/')
+      end
+    end
+
+    # Is this a local package? Returns true if created from an in-memory object or a file/directory reference
+    def local?
+      return @local if @local
+      return false if @location =~ /\A#{URI::regexp}\z/
+      true
+    end
+
     def property(property, default = nil)
       self[property] || default
     end
+
+    # Private
 
     private
 
