@@ -2,7 +2,9 @@ module DataPackage
   class Profile < Hash
     include DataPackage::Helpers
 
-    attr_reader :name, :registry
+    # Public
+
+    attr_reader :name
 
     def initialize(descriptor)
       unless descriptor.is_a?(String)
@@ -24,13 +26,6 @@ module DataPackage
       self.to_h
     end
 
-    # Returns true if there are no errors in data, false if there are
-    def valid?(data)
-      JSON::Validator.validate(self, data)
-    end
-
-    alias :valid :valid?
-
     # Validate data against this profile. Returns true or raises DataPackage::ValidationError
     def validate(data)
       JSON::Validator.validate!(self, data)
@@ -43,13 +38,22 @@ module DataPackage
       JSON::Validator.fully_validate(self, data).each{ |error| yield error }
     end
 
+    # Returns true if there are no errors in data, false if there are
+    def valid?(data)
+      JSON::Validator.validate(self, data)
+    end
+
+    alias :valid :valid?
+
+    # Private
+
     private
 
     def get_profile_from_registry(descriptor)
       @registry = DataPackage::Registry.new
-      profile_metadata = registry.profiles.fetch(descriptor)
+      profile_metadata = @registry.profiles.fetch(descriptor)
       if profile_metadata.fetch('schema_path', nil)
-        profile_path = join_paths(base_path(registry.path), profile_metadata['schema_path'])
+        profile_path = join_paths(base_path(@registry.path), profile_metadata['schema_path'])
       else
         profile_path = profile_metadata['schema']
       end
