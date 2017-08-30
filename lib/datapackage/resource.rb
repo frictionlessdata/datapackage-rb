@@ -123,7 +123,7 @@ module DataPackage
     end
 
     def get_table
-      @table ||= TableSchema::Table.new(self.source, self['schema']) if tabular?
+      @table ||= TableSchema::Table.new(self.source, schema: self['schema']) if tabular?
     end
 
     def apply_defaults!
