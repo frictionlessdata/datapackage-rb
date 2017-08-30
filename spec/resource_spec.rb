@@ -224,4 +224,17 @@ describe DataPackage::Resource do
     end
 
   end
+
+  context 'read' do
+
+    it 'reads tabular data' do
+      resource = DataPackage::Resource.new(tabular_resource)
+      expect(resource.headers).to eq(['str', 'int'])
+      expect(resource.schema.field_names).to eq(['str', 'int'])
+      expect(resource.read).to eq([['1', 2]])
+      expect(resource.read(keyed: true)).to eq([{'str'=> '1', 'int'=> 2}])
+    end
+
+  end
+
 end
