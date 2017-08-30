@@ -67,8 +67,40 @@ module DataPackage
 
     alias :tabular :tabular?
 
+    def headers
+      if !tabular
+        nil
+      end
+      get_table.headers
+    end
+
+    def schema
+      if !tabular
+        nil
+      end
+      get_table.schema
+    end
+
+    def iter(*args, &block)
+      if !tabular
+        message ='Methods iter/read are not supported for non tabular data'
+        raise ResourceException.new message
+      end
+      get_table.iter(*args, &block)
+    end
+
+    def read(*args, &block)
+      if !tabular
+        message ='Methods iter/read are not supported for non tabular data'
+        raise ResourceException.new message
+      end
+      get_table.read(*args, &block)
+    end
+
+    # Deprecated
+
     def table
-      @table ||= TableSchema::Table.new(self.source, self['schema']) if tabular?
+      get_table
     end
 
     # Private
@@ -88,6 +120,10 @@ module DataPackage
       else
         raise ResourceException.new 'A resource descriptor must have a `path` or `data` property.'
       end
+    end
+
+    def get_table
+      @table ||= TableSchema::Table.new(self.source, self['schema']) if tabular?
     end
 
     def apply_defaults!

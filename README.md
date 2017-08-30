@@ -108,20 +108,23 @@ first_resource.tabular?
 first_resource.source
 ```
 
-You can then read the source depending on its `source_type`: `inline`, `remote` or `local`.
+You can then read the source depending on its type. For example if resource is local and not multipart it could by open as a file: `File.open(resource.source)`.
 
 If a resource complies with the [Tabular Data Resource spec](https://specs.frictionlessdata.io/tabular-data-resource/) or uses the
-`tabular-data-resource` [profile](#profiles) you can make a [TableSchema::Table](https://github.com/frictionlessdata/tableschema-rb) for it:
+`tabular-data-resource` [profile](#profiles) you can read resource rows:
 
 ```ruby
-package.resources[0].tabular?
-table = package.resources[0].table
+resoure = package.resources[0]
+resource.tabular?
+resource.headers
+resource.schema
 
-# Read the entire table at once
-data = table.read
+# Read the the whole rows at once
+data = resource.read
+data = resource.read(keyed: true)
 
 # Or iterate through it
-data = table.iter {|row| print row}
+data = resource.iter {|row| print row}
 ```
 
 See [TableSchema](https://github.com/frictionlessdata/tableschema-rb) documentation for other things you can do with tabular resource.
