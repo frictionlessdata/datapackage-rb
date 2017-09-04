@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'colorize'
   s.add_dependency 'rubyzip'
   s.add_dependency 'ruby_dig'
-  s.add_dependency 'tableschema', '~> 0.6'
+  s.add_dependency 'tableschema'
 
   s.add_development_dependency 'bundler', '~> 1.3'
   s.add_development_dependency 'rake'
