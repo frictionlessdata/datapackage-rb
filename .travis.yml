@@ -1,12 +1,24 @@
+language:
+  ruby
+
 rvm:
-  - 2.3.3
-  # - 2.4.0
+- 2.3.3
+
+env:
+  global:
+    secure: YfFmjrohBO4Gbw7oqBVyy9f5jIu01cRLgMUFnyX2ju4RoW75CKetxGG6AqSolbYf+yjO4MO65L2quX/IkqVPFmKLQAVfm6atAaEFir6yC7KmQu792bNPOZ2pfY5NbKP/uq0mLU6tsPPV3TAajm7E9hcBMFIV7PJHuP3UJ6LVlUQ=
+
 before_install:
-  - gem update bundler
+  - gem install bundler -v 1.11.2
   - gem install rubygems-update
   - update_rubygems
+
 install:
   - bundle install --full-index
+
+script:
+  - rake spec
+
 deploy:
   provider: rubygems
   api_key:
@@ -14,8 +26,3 @@ deploy:
   gem: datapackage
   on:
     tags: true
-env:
-  global:
-    secure: YfFmjrohBO4Gbw7oqBVyy9f5jIu01cRLgMUFnyX2ju4RoW75CKetxGG6AqSolbYf+yjO4MO65L2quX/IkqVPFmKLQAVfm6atAaEFir6yC7KmQu792bNPOZ2pfY5NbKP/uq0mLU6tsPPV3TAajm7E9hcBMFIV7PJHuP3UJ6LVlUQ=
-after_success:
-  - bundle exec henry deploy
