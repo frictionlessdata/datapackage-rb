@@ -6,6 +6,30 @@ module DataPackage
 
     attr_reader :errors, :profile, :name, :source
 
+    def self.infer(filepath)
+      name = File.basename(filepath)
+      if name[-4..-1] != '.csv'
+        raise ResourceException.new('Inferrable resource must have .csv extension')
+      end
+
+      descr = {
+        'format' => 'csv',
+        'mediatype' => 'text/csv',
+        'name' => name[0...-4],
+        'path' => filepath,
+        'schema' => {
+          'fields' => []
+        },
+      }
+
+      csv = CSV.read(filepath, headers: true)
+      csv.headers.each do |header|
+        descr['schema']['fields'] << {'format' => 'default', 'name' => header, 'type' => 'string'}
+      end
+
+      new(descr)
+    end
+
     def initialize(resource, base_path = '')
       self.merge! dereference_descriptor(resource, base_path: base_path,
         reference_fields: ['schema', 'dialect'])

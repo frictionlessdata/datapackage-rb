@@ -419,4 +419,43 @@ describe DataPackage::Package do
       end
 
     end
+
+  context 'inferring a datapackage from a data directory' do
+    it 'infers a datapackage.json schema referencing all CSVs in the directory' do
+      package = DataPackage::Package.new
+      descriptor = package.infer(directory: 'data', base_path: 'spec/fixtures')
+
+      expect(descriptor).to eq({
+        'profile' => 'tabular-data-package',
+        'resources' => [
+          {
+            'encoding' => 'utf-8',
+            'format' => 'csv',
+            'mediatype' => 'text/csv',
+            'name' => 'prices',
+            'path' => 'prices.csv',
+            'profile' => 'tabular-data-resource',
+            'schema' => {
+              'fields' => [
+                {'format' => 'default', 'name' => 'id', 'type' => 'string'},
+                {'format' => 'default', 'name' => 'price', 'type' => 'integer'}]
+            }
+          },
+          {
+            'encoding' => 'utf-8',
+            'format' => 'csv',
+            'mediatype' => 'text/csv',
+            'name' => 'names',
+            'path' => 'names.csv',
+            'profile' => 'tabular-data-resource',
+            'schema' => {
+              'fields' => [
+                {'format' => 'default', 'name' => 'id', 'type' => 'string'},
+                {'format' => 'default', 'name' => 'name', 'type' => 'string'}]
+            }
+          }
+        ]
+      })
+    end
+  end
 end
