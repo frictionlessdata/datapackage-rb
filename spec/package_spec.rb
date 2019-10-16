@@ -429,30 +429,34 @@ describe DataPackage::Package do
         'profile' => 'tabular-data-package',
         'resources' => [
           {
-            'encoding' => 'utf-8',
             'format' => 'csv',
             'mediatype' => 'text/csv',
             'name' => 'prices',
-            'path' => 'prices.csv',
-            'profile' => 'tabular-data-resource',
+            'path' => 'spec/fixtures/data/prices.csv',
             'schema' => {
               'fields' => [
                 {'format' => 'default', 'name' => 'id', 'type' => 'string'},
-                {'format' => 'default', 'name' => 'price', 'type' => 'integer'}]
-            }
+                {'format' => 'default', 'name' => 'price', 'type' => 'string'}],
+              'missingValues'=>[''],
+            },
+            'profile' => 'tabular-data-resource',
+            'encoding' => 'utf-8'
           },
           {
             'encoding' => 'utf-8',
             'format' => 'csv',
             'mediatype' => 'text/csv',
             'name' => 'names',
-            'path' => 'names.csv',
+            'path' => 'spec/fixtures/data/names.csv',
             'profile' => 'tabular-data-resource',
             'schema' => {
               'fields' => [
                 {'format' => 'default', 'name' => 'id', 'type' => 'string'},
-                {'format' => 'default', 'name' => 'name', 'type' => 'string'}]
-            }
+                {'format' => 'default', 'name' => 'name', 'type' => 'string'}],
+              'missingValues'=>['']
+            },
+            'profile' => 'tabular-data-resource',
+            'encoding' => 'utf-8'
           }
         ]
       })

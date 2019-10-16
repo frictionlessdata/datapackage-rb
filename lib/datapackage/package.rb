@@ -128,6 +128,12 @@ module DataPackage
         resource = Resource.infer(filename)
         add_resource(resource)
       end
+
+      # If there were CSVs, this is a tabular data package
+      if resources.count > 0
+        self['profile'] = 'tabular-data-package'
+      end
+
       descriptor
     end
 

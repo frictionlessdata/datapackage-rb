@@ -156,6 +156,7 @@ module DataPackage
     end
 
     def apply_table_defaults!
+      self['profile'] = DataPackage::DEFAULTS[:resource][:tabular_profile]
       if self.fetch('schema', nil)
         self['schema']['missingValues'] = DataPackage::DEFAULTS[:schema][:missing_values]
         self['schema'].fetch('fields', []).each do |field_descriptor|
