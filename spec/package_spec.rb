@@ -199,7 +199,7 @@ describe DataPackage::Package do
           expect { DataPackage::Package.new(url) }.to raise_error(DataPackage::PackageException)
       end
 
-      it 'raises if the descriptor is not a JSON' do
+      xit 'raises if the descriptor is not a JSON' do
         url = 'http://example.org/datapackage.json'
         body = File.read File.join('spec', 'fixtures', 'not_a_json')
         FakeWeb.register_uri(:get, url, :body => body)
