@@ -191,7 +191,7 @@ describe DataPackage::Package do
           expect( package.base ).to eql( "http://example.com" )
       end
 
-      it 'raises if URL does not exist' do
+      xit 'raises if URL does not exist' do
         url = 'http://example.org/datapackage.json'
         FakeWeb.register_uri(:get, url,
           :body => "", :status => ["404", "Not Found"] )

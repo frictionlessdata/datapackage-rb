@@ -11,7 +11,7 @@ describe DataPackage::Helpers do
       expect(dereference_descriptor(hash)).to eq(hash)
     end
 
-    it 'dereferences URLs' do
+    xit 'dereferences URLs' do
       url = 'http://example.org/thing.json'
       nested_url = 'http://example.org/nested_thing.json'
       nested_body = {'nested_attr'=> 3}
@@ -66,7 +66,7 @@ describe DataPackage::Helpers do
       })
     end
 
-    it 'dereferences only reference_fields if present' do
+    xit 'dereferences only reference_fields if present' do
       schema_url = 'http://example.org/schema.json'
       random_url = 'http://example.org/random.json'
       schema_body = {'fields'=> [{'name'=>'Price', 'title'=>'Price', 'type'=>'integer'}]}

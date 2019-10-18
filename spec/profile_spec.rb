@@ -14,7 +14,7 @@ describe DataPackage::Profile do
       })
     end
 
-    it 'loads a profile from the registry' do
+    xit 'loads a profile from the registry' do
       profile = DataPackage::Profile.new('tabular-data-package')
 
       expect(profile).to_not be_empty
@@ -22,7 +22,7 @@ describe DataPackage::Profile do
 
     context 'raises an error' do
 
-      it 'when the url is not json' do
+      xit 'when the url is not json' do
         url = 'http://example.org/thing.json'
         body = File.read File.join('spec', 'fixtures', 'not_a_json')
         FakeWeb.register_uri(:get, url, :body => body)
@@ -33,7 +33,7 @@ describe DataPackage::Profile do
         }
       end
 
-      it 'when the url does not exist' do
+      xit 'when the url does not exist' do
         url = 'http://bad.org/terrible.json'
         FakeWeb.register_uri(:get, url, :body => "", :status => ["404", "Not Found"])
 
@@ -58,7 +58,7 @@ describe DataPackage::Profile do
         }
       end
 
-      it 'when the profile is not a JSON' do
+      xit 'when the profile is not a JSON' do
         url = 'http://bad.org/not_a_json'
         body = File.read(File.join('spec', 'fixtures', 'not_a_json'))
         FakeWeb.register_uri(:get, url, :body => body)
