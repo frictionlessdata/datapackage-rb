@@ -15,10 +15,15 @@ install:
 script:
   - rake spec
 
-deploy:
-  provider: rubygems
-  api_key:
-    secure: K7fTcRGf4oxwkXq5kmntfLDr/+fYK9v7TDa8iR7HOWoerCEYTmuF4S3tozW0xc5aOVWdcVmTubwYp0oLwrzV516kY6SaLrUjUfK6sKSJb6q4E95pObuAcgjTaqFJra99gMplsHcXrSoasQvIjZ4qWiWMsJIR7LAruEuBWyol76c=
-  gem: datapackage
-  on:
-    tags: true
+jobs:
+  include:
+    - stage: release
+      if: tag IS present
+      rvm: 2.4.0
+      deploy:
+        provider: rubygems
+        gem: datapackage
+        on:
+          tags: true
+        api_key:
+          secure: K7fTcRGf4oxwkXq5kmntfLDr/+fYK9v7TDa8iR7HOWoerCEYTmuF4S3tozW0xc5aOVWdcVmTubwYp0oLwrzV516kY6SaLrUjUfK6sKSJb6q4E95pObuAcgjTaqFJra99gMplsHcXrSoasQvIjZ4qWiWMsJIR7LAruEuBWyol76c=
