@@ -435,8 +435,13 @@ describe DataPackage::Package do
             'path' => 'spec/fixtures/data/prices.csv',
             'schema' => {
               'fields' => [
-                {'format' => 'default', 'name' => 'id', 'type' => 'string'},
-                {'format' => 'default', 'name' => 'price', 'type' => 'string'}],
+                {'format' => 'default', 'name' => 'id', 'type' => 'any'},
+                {'format' => 'default', 'name' => 'price', 'type' => 'integer'},
+                {'format' => 'default', 'name' => 'year_to_market', 'type' => 'year'},
+                {'format' => 'default', 'name' => 'added_on', 'type' => 'date'},
+                {'format' => 'default', 'name' => 'updated_at', 'type' => 'datetime'},
+                {'format' => 'default', 'name' => 'cutoff_time', 'type' => 'time'},
+              ],
               'missingValues'=>[''],
             },
             'profile' => 'tabular-data-resource',
@@ -451,8 +456,8 @@ describe DataPackage::Package do
             'profile' => 'tabular-data-resource',
             'schema' => {
               'fields' => [
-                {'format' => 'default', 'name' => 'id', 'type' => 'string'},
-                {'format' => 'default', 'name' => 'name', 'type' => 'string'}],
+                {'format' => 'default', 'name' => 'id', 'type' => 'any'},
+                {'format' => 'default', 'name' => 'name', 'type' => 'any'}],
               'missingValues'=>['']
             },
             'profile' => 'tabular-data-resource',

@@ -23,8 +23,11 @@ module DataPackage
       }
 
       csv = CSV.read(filepath, headers: true)
+      interpreter = DataPackage::Interpreter.new(csv)
       csv.headers.each do |header|
-        descr['schema']['fields'] << {'format' => 'default', 'name' => header, 'type' => 'string'}
+        field = { 'name' => header, 'type' => 'string'}
+        field.merge! interpreter.type_and_format_at(header)
+        descr['schema']['fields'] << field
       end
 
       new(descr)
