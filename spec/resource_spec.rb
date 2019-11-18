@@ -237,4 +237,38 @@ describe DataPackage::Resource do
 
   end
 
+  describe '.infer' do
+    it 'returns error for non-CSV files' do
+      file_path = 'spec/fixtures/foo.txt'
+
+      expect { DataPackage::Resource.infer(file_path) }.to raise_error(DataPackage::ResourceException)
+    end
+
+    it 'infers schema for CSV to use to initialise Resource instance' do
+      csv_path = 'spec/fixtures/data/prices.csv'
+      resource = DataPackage::Resource.infer(csv_path)
+
+
+      expect(resource).to eq({
+        'format' => 'csv',
+        'mediatype' => 'text/csv',
+        'name' => 'prices',
+        'path' => 'spec/fixtures/data/prices.csv',
+        'schema' => {
+          'fields' => [
+            {'format' => 'default', 'name' => 'id', 'type' => 'any'},
+            {'format' => 'default', 'name' => 'price', 'type' => 'integer'},
+            {'format' => 'default', 'name' => 'year_to_market', 'type' => 'year'},
+            {'format' => 'default', 'name' => 'added_on', 'type' => 'date'},
+            {'format' => 'default', 'name' => 'updated_at', 'type' => 'datetime'},
+            {'format' => 'default', 'name' => 'cutoff_time', 'type' => 'time'}
+          ],
+          'missingValues'=>[''],
+        },
+        'profile' => 'tabular-data-resource',
+        'encoding' => 'utf-8'
+      })
+    end
+  end
+
 end

@@ -419,4 +419,52 @@ describe DataPackage::Package do
       end
 
     end
+
+  context 'inferring a datapackage from a data directory' do
+    it 'infers a datapackage.json schema referencing all CSVs in the directory' do
+      package = DataPackage::Package.new
+      descriptor = package.infer(directory: 'data', base_path: 'spec/fixtures')
+
+      expect(descriptor).to eq({
+        'profile' => 'tabular-data-package',
+        'resources' => [
+          {
+            'format' => 'csv',
+            'mediatype' => 'text/csv',
+            'name' => 'prices',
+            'path' => 'spec/fixtures/data/prices.csv',
+            'schema' => {
+              'fields' => [
+                {'format' => 'default', 'name' => 'id', 'type' => 'any'},
+                {'format' => 'default', 'name' => 'price', 'type' => 'integer'},
+                {'format' => 'default', 'name' => 'year_to_market', 'type' => 'year'},
+                {'format' => 'default', 'name' => 'added_on', 'type' => 'date'},
+                {'format' => 'default', 'name' => 'updated_at', 'type' => 'datetime'},
+                {'format' => 'default', 'name' => 'cutoff_time', 'type' => 'time'},
+              ],
+              'missingValues'=>[''],
+            },
+            'profile' => 'tabular-data-resource',
+            'encoding' => 'utf-8'
+          },
+          {
+            'encoding' => 'utf-8',
+            'format' => 'csv',
+            'mediatype' => 'text/csv',
+            'name' => 'names',
+            'path' => 'spec/fixtures/data/names.csv',
+            'profile' => 'tabular-data-resource',
+            'schema' => {
+              'fields' => [
+                {'format' => 'default', 'name' => 'id', 'type' => 'any'},
+                {'format' => 'default', 'name' => 'name', 'type' => 'any'}],
+              'missingValues'=>['']
+            },
+            'profile' => 'tabular-data-resource',
+            'encoding' => 'utf-8'
+          }
+        ]
+      })
+    end
+  end
 end

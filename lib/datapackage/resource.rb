@@ -6,6 +6,33 @@ module DataPackage
 
     attr_reader :errors, :profile, :name, :source
 
+    def self.infer(filepath)
+      name = File.basename(filepath)
+      if name[-4..-1] != '.csv'
+        raise ResourceException.new('Inferrable resource must have .csv extension')
+      end
+
+      descr = {
+        'format' => 'csv',
+        'mediatype' => 'text/csv',
+        'name' => name[0...-4],
+        'path' => filepath,
+        'schema' => {
+          'fields' => []
+        },
+      }
+
+      csv = CSV.read(filepath, headers: true)
+      interpreter = DataPackage::Interpreter.new(csv)
+      csv.headers.each do |header|
+        field = { 'name' => header, 'type' => 'string'}
+        field.merge! interpreter.type_and_format_at(header)
+        descr['schema']['fields'] << field
+      end
+
+      new(descr)
+    end
+
     def initialize(resource, base_path = '')
       self.merge! dereference_descriptor(resource, base_path: base_path,
         reference_fields: ['schema', 'dialect'])
@@ -132,6 +159,7 @@ module DataPackage
     end
 
     def apply_table_defaults!
+      self['profile'] = DataPackage::DEFAULTS[:resource][:tabular_profile]
       if self.fetch('schema', nil)
         self['schema']['missingValues'] = DataPackage::DEFAULTS[:schema][:missing_values]
         self['schema'].fetch('fields', []).each do |field_descriptor|

@@ -119,6 +119,24 @@ module DataPackage
       self[property] || default
     end
 
+    def infer(base_path: nil, directory: nil)
+      raise PackageException.new('Base path is required for infer') unless base_path
+      raise PackageException.new('Directory is required for infer') unless directory
+
+      dir_path = File.join(base_path, directory)
+      Dir.glob("#{dir_path}/*.csv") do |filename|
+        resource = Resource.infer(filename)
+        add_resource(resource)
+      end
+
+      # If there were CSVs, this is a tabular data package
+      if resources.count > 0
+        self['profile'] = 'tabular-data-package'
+      end
+
+      descriptor
+    end
+
     # Private
 
     private
