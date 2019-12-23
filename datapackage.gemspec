@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'ruby_dig'
   s.add_dependency 'tableschema'
 
-  s.add_development_dependency 'bundler', '~> 1.3'
+  s.add_development_dependency 'bundler', '~> 2.1'
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'fakeweb', '~> 1.3'
