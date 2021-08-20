@@ -1,7 +1,7 @@
 # datapackage-rb
 
-[![Build](https://travis-ci.org/frictionlessdata/datapackage-rb.svg?branch=master)](https://travis-ci.org/frictionlessdata/datapackage-rb)
-[![Coverage](http://img.shields.io/coveralls/frictionlessdata/datapackage-rb.svg?branch=master)](https://coveralls.io/r/frictionlessdata/datapackage-rb?branch=master)
+[![Build](https://img.shields.io/github/workflow/status/frictionlessdata/datapackage-rb/general/main)](https://github.com/frictionlessdata/datapackage-rb/actions)
+[![Coverage](https://img.shields.io/codecov/c/github/frictionlessdata/datapackage-rb/main)](https://codecov.io/gh/frictionlessdata/datapackage-rb)
 [![Release](http://img.shields.io/gem/v/datapackage.svg)](https://rubygems.org/gems/datapackage)
 [![Codebase](https://img.shields.io/badge/codebase-github-brightgreen)](https://github.com/frictionlessdata/datapackage-rb)
 [![Support](https://img.shields.io/badge/support-discord-brightgreen)](https://discordapp.com/invite/Sewv6av)
